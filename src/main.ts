@@ -1,17 +1,22 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const sequelize = require("./database/connection");
-const passport = require("passport");
-const session = require("express-session");
+import * as dotenv from 'dotenv'
 
-const app = express();
+dotenv.config();
 
-const user = require("./router/user.router");
-const encomienda = require("./router/encomienda.router");
-const sede = require("./router/sede.router");
-const login = require("./router/login.route");
-const docs = require("./router/generatedocument");
+import express, { Express } from 'express'
+
+import sequelize from './database/connection'
+import cors from 'cors'
+import passport from 'passport'
+import session from 'express-session'
+
+// Routes ****************************************************************
+import userRoute from './router/user.router'
+import encomiendaRoute from './router/encomienda.router'
+import sedeRoute from './router/sede.router'
+import loginRoute from './router/login.route'
+import documentRoute from './router/generatedocument'
+
+const app: Express = express();
 
 const corsOptions = {
   origin: [
@@ -37,17 +42,17 @@ app.use(
     saveUninitialized: false,
   })
 );
-app.use(require("flash")());
+
 app.use(passport.initialize());
 app.use(passport.session());
 
 require("./auth/config.passport")(passport);
 
-app.use("/user", user);
-app.use("/api/login", login);
-app.use("/encomienda", encomienda);
-app.use("/sede", sede);
-app.use("/api/docs", docs);
+app.use("/user", userRoute);
+app.use("/api/login", loginRoute);
+app.use("/encomienda", encomiendaRoute);
+app.use("/sede", sedeRoute);
+app.use("/api/docs", documentRoute);
 
 
 async function assertDatabaseConnectionOk() {
@@ -58,7 +63,7 @@ async function assertDatabaseConnectionOk() {
     console.log("Database connection OK!");
   } catch (error) {
     console.log("Unable to connect to the database:");
-    console.log(error.message);
+    console.log(error);
     process.exit(1);
   }
 }

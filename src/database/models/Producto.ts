@@ -1,7 +1,18 @@
-const { DataTypes } = require("sequelize");
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize } from "sequelize";
 
-module.exports = (sequelize) => {
-  sequelize.define("producto", {
+interface IProductoModel extends Model<InferAttributes<IProductoModel>, InferCreationAttributes<IProductoModel>> {
+  id: CreationOptional<string>
+  nombre: string
+  peso: number
+  cantidad: number
+  descripcion: string
+  pesoCob: number
+  pesoVol: number
+  valorDeclarado: number
+}
+
+const productoModelDefiner = (sequelize: Sequelize) => {
+  sequelize.define<IProductoModel>("producto", {
     id: {
       allowNull: false,
       defaultValue: DataTypes.UUIDV4,
@@ -10,8 +21,7 @@ module.exports = (sequelize) => {
     },
     nombre: {
       allowNull: false,
-      type: DataTypes.STRING,
-      length: 50,
+      type: DataTypes.STRING(50),
     },
     peso: {
       type: DataTypes.DOUBLE,
@@ -39,3 +49,8 @@ module.exports = (sequelize) => {
     },
   });
 };
+
+export {
+  IProductoModel,
+  productoModelDefiner
+}

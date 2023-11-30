@@ -1,4 +1,8 @@
-function applyExtraSetup(sequelize) {
+import { Sequelize } from "sequelize";
+
+function applyExtraSetup(sequelize: Sequelize): void {
+  console.log(sequelize.models);
+  
   const { encomienda, usuario, ubicacion, producto, sede } = sequelize.models;
 
   usuario.belongsTo(ubicacion);
@@ -11,4 +15,4 @@ function applyExtraSetup(sequelize) {
   encomienda.belongsTo(sede, { as: "sede" });
 }
 
-module.exports = { applyExtraSetup };
+export default applyExtraSetup

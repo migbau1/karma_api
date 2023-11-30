@@ -1,13 +1,36 @@
-const { DataTypes, INTEGER } = require("sequelize");
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize } from "sequelize";
+import { IUbicationModel } from "./Ubicacion";
+import { IUserModel } from "./User";
+import { IProductoModel } from "./Producto";
+import { ISedeModel } from "./Sede";
 
-module.exports = (sequelize) => {
-  sequelize.define("encomienda", {
+interface IEncomiendaModel extends Model<InferAttributes<IEncomiendaModel>, InferCreationAttributes<IEncomiendaModel>> {
+  id: CreationOptional<string>
+  remitenteId: IUserModel
+  destinatarioId: IUserModel
+  origenId: IUbicationModel
+  destinoId: IUbicationModel
+  productoId: IProductoModel
+  descripcion: string
+  sedeId: ISedeModel
+  tipoProducto: string
+  valorSeguro: number
+  otrosCobros: number
+  valorFlete: number
+  recargos: number
+  descuento: number
+  formaPago: string
+}
+
+
+const encomiendaModelDefiner = (sequelize: Sequelize) => {
+  sequelize.define<IEncomiendaModel>("encomienda", {
     id: {
       type: DataTypes.BIGINT(),
       primaryKey: true,
       allowNull: false,
       autoIncrement: true,
-      
+
     },
     remitenteId: {
       type: DataTypes.UUID,
@@ -46,8 +69,7 @@ module.exports = (sequelize) => {
     },
     descripcion: {
       allowNull: false,
-      type: DataTypes.STRING,
-      length: 50,
+      type: DataTypes.STRING(50),
     },
     sedeId: {
       type: DataTypes.UUID,
@@ -58,8 +80,7 @@ module.exports = (sequelize) => {
     },
     tipoProducto: {
       allowNull: true,
-      type: DataTypes.STRING,
-      length: 50,
+      type: DataTypes.STRING(50),
     },
     valorSeguro: {
       allowNull: true,
@@ -87,3 +108,8 @@ module.exports = (sequelize) => {
     },
   });
 };
+
+export {
+  IEncomiendaModel,
+  encomiendaModelDefiner
+}

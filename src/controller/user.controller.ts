@@ -1,16 +1,18 @@
-const { models } = require("../database/connection");
-const sequelize = require("../database/connection");
+import { Op } from 'sequelize'
+import sequelize from '../database/connection'
+import util from 'util'
+import { Request, Response } from 'express';
 
-var util = require("util");
-const { fn, col, literal, Op } = require("sequelize");
+// const { models } = require("../database/connection");
+const { models } = sequelize
 
 const PER_PAGE = 10;
 
-function getPaginatedItems(items, offset) {
+function getPaginatedItems(items: Array<any>, offset: number) {
   return items.slice(offset, offset + PER_PAGE);
 }
 
-async function getAll(req, res) {
+async function getAll(req: Request, res: Response) {
   const t = await sequelize.transaction();
   try {
     const users = await models.usuario.findAll({
@@ -38,7 +40,7 @@ async function getAll(req, res) {
     users != undefined ? res.send(JSON.stringify(json)) : res.send("{}");
 
     await t.commit();
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -49,7 +51,7 @@ async function getAll(req, res) {
   }
 }
 
-async function getByCedula(req, res) {
+async function getByCedula(req: Request, res: Response) {
   const t = await sequelize.transaction();
   try {
     const user = await models.usuario.findOne({
@@ -65,7 +67,7 @@ async function getByCedula(req, res) {
     });
     user != undefined ? res.send(JSON.stringify(user)) : res.send("{}");
     await t.commit();
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -76,7 +78,7 @@ async function getByCedula(req, res) {
   }
 }
 
-async function updateUser(req, res) {
+async function updateUser(req: Request, res: Response) {
   const t = await sequelize.transaction();
   const { ubicacion, nombre, apellido, cedula, telefono } = req.body;
   try {
@@ -93,39 +95,42 @@ async function updateUser(req, res) {
       transaction: t,
     });
 
-    if (usuario.ubicacion) {
-      usuario.ubicacion.update(ubicacion);
+    if (usuario) {
 
-      usuario.update({
-        nombre: nombre,
-        apellido: apellido,
-        cedula: cedula,
-        telefono: telefono,
-      });
-    } else {
-      const newUbi = await models.ubicacion.create(ubicacion, {
-        transaction: t,
-      });
+      // if (usuario.ubicacion) {
+      //   usuario.ubicacion.update(ubicacion);
 
-      await usuario.update(
-        {
-          nombre: nombre,
-          apellido: apellido,
-          cedula: cedula,
-          telefono: telefono,
-          ubicacionId: newUbi.getDataValue("id"),
-        },
-        {
-          transaction: t,
-        }
-      );
+      //   usuario.update({
+      //     nombre: nombre,
+      //     apellido: apellido,
+      //     cedula: cedula,
+      //     telefono: telefono,
+      //   });
+      // } else {
+      //   const newUbi = await models.ubicacion.create(ubicacion, {
+      //     transaction: t,
+      //   });
+
+      //   await usuario.update(
+      //     {
+      //       nombre: nombre,
+      //       apellido: apellido,
+      //       cedula: cedula,
+      //       telefono: telefono,
+      //       ubicacionId: newUbi.getDataValue("id"),
+      //     },
+      //     {
+      //       transaction: t,
+      //     }
+      //   );
+      // }
     }
 
     usuario != undefined
       ? res.send(JSON.stringify(usuario.get()))
       : res.send("{}");
     await t.commit();
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -136,7 +141,7 @@ async function updateUser(req, res) {
   }
 }
 
-async function createOne(req, res) {
+async function createOne(req: Request, res: Response) {
   const t = await sequelize.transaction();
   try {
     const user = req.body.data;
@@ -172,7 +177,7 @@ async function createOne(req, res) {
 
     await t.commit();
     users != undefined ? res.send(JSON.stringify(users)) : res.send("{}");
-  } catch (error) {
+  } catch (error: any) {
     await t.rollback();
     console.error(error);
     res.send({
@@ -183,7 +188,7 @@ async function createOne(req, res) {
   }
 }
 
-async function getRemitentes(req, res) {
+async function getRemitentes(req: Request, res: Response) {
   try {
     const users = await sequelize.query(
       `SELECT DISTINCT encomienda.remitenteId, remitente.nombre FROM encomiendas as encomienda
@@ -193,7 +198,7 @@ async function getRemitentes(req, res) {
     );
 
     res.send(users[0]);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -203,7 +208,7 @@ async function getRemitentes(req, res) {
   }
 }
 
-async function searchEngineUser(req, res) {
+async function searchEngineUser(req: Request, res: Response) {
   const t = await sequelize.transaction();
 
   const f = req.body.f;
@@ -252,7 +257,7 @@ async function searchEngineUser(req, res) {
     users != undefined ? res.send(json) : res.send("{}");
 
     await t.commit();
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -263,7 +268,7 @@ async function searchEngineUser(req, res) {
   }
 }
 
-module.exports = {
+export {
   getAll,
   createOne,
   getByCedula,

@@ -1,8 +1,9 @@
-import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize } from "sequelize";
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize, UUID, UUIDV4 } from "sequelize";
 import { IUbicationModel } from "./Ubicacion";
-import { IUserModel } from "./User";
+import { IUserModel } from "./Usuarios";
 import { IProductoModel } from "./Producto";
 import { ISedeModel } from "./Sede";
+import { IRegistroModel } from "./Registro";
 
 interface IEncomiendaModel extends Model<InferAttributes<IEncomiendaModel>, InferCreationAttributes<IEncomiendaModel>> {
   id: CreationOptional<string>
@@ -12,25 +13,19 @@ interface IEncomiendaModel extends Model<InferAttributes<IEncomiendaModel>, Infe
   destinoId: IUbicationModel
   productoId: IProductoModel
   descripcion: string
-  sedeId: ISedeModel
-  tipoProducto: string
-  valorSeguro: number
-  otrosCobros: number
-  valorFlete: number
-  recargos: number
-  descuento: number
-  formaPago: string
+  registro: IRegistroModel
+  createdAt: Date
+  updatedAt: Date
 }
 
 
 const encomiendaModelDefiner = (sequelize: Sequelize) => {
-  sequelize.define<IEncomiendaModel>("encomienda", {
+  sequelize.define<IEncomiendaModel>("encomiendas", {
     id: {
-      type: DataTypes.BIGINT(),
+      type: UUID,
       primaryKey: true,
       allowNull: false,
-      autoIncrement: true,
-
+      defaultValue: UUIDV4,
     },
     remitenteId: {
       type: DataTypes.UUID,
@@ -38,6 +33,7 @@ const encomiendaModelDefiner = (sequelize: Sequelize) => {
         model: "usuarios",
         key: "id",
       },
+      field: 'remitente_id'
     },
     destinatarioId: {
       type: DataTypes.UUID,
@@ -45,20 +41,23 @@ const encomiendaModelDefiner = (sequelize: Sequelize) => {
         model: "usuarios",
         key: "id",
       },
+      field: 'destinatario_id'
     },
     origenId: {
       type: DataTypes.UUID,
       references: {
-        model: "ubicacions",
+        model: "ubicacion",
         key: "id",
       },
+      field: 'origen_id'
     },
     destinoId: {
       type: DataTypes.UUID,
       references: {
-        model: "ubicacions",
+        model: "ubicacion",
         key: "id",
       },
+      field: 'destino_id'
     },
     productoId: {
       type: DataTypes.UUID,
@@ -66,46 +65,23 @@ const encomiendaModelDefiner = (sequelize: Sequelize) => {
         model: "productos",
         key: "id",
       },
+      field: 'producto_id'
     },
     descripcion: {
       allowNull: false,
       type: DataTypes.STRING(50),
     },
-    sedeId: {
-      type: DataTypes.UUID,
+    registro: {
+      type: UUID,
       references: {
-        model: "sedes",
-        key: "id",
-      },
+        model: {
+          tableName: 'registro_encomiendas'
+        },
+        key: 'id'
+      }
     },
-    tipoProducto: {
-      allowNull: true,
-      type: DataTypes.STRING(50),
-    },
-    valorSeguro: {
-      allowNull: true,
-      type: DataTypes.DOUBLE,
-    },
-    otrosCobros: {
-      allowNull: true,
-      type: DataTypes.DOUBLE,
-    },
-    valorFlete: {
-      allowNull: true,
-      type: DataTypes.DOUBLE,
-    },
-    recargos: {
-      allowNull: true,
-      type: DataTypes.DOUBLE,
-    },
-    descuento: {
-      allowNull: true,
-      type: DataTypes.DOUBLE,
-    },
-    formaPago: {
-      allowNull: true,
-      type: DataTypes.STRING,
-    },
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   });
 };
 

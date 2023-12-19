@@ -1,11 +1,14 @@
-const { models } = require("../database/connection");
+import { Request, Response } from "express";
+import sequelize from "../database/connection";
 
-async function getAll(req, res) {
+const { models } = sequelize
+
+async function getAll(req: Request, res: Response) {
   try {
     const sede = await models.sede.findAll();
 
     sede != undefined ? res.send(JSON.stringify(sede)) : res.send("{}");
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -15,7 +18,7 @@ async function getAll(req, res) {
   }
 }
 
-async function createOne(req, res) {
+async function createOne(req: Request, res: Response) {
   try {
     const sede = req.body.data;
 
@@ -27,7 +30,7 @@ async function createOne(req, res) {
     });
 
     sede != undefined ? res.send(JSON.stringify(sedes)) : res.send("{}");
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -37,4 +40,4 @@ async function createOne(req, res) {
   }
 }
 
-module.exports = { getAll, createOne };
+export { getAll, createOne };

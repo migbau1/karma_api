@@ -1,16 +1,19 @@
-const { models } = require("../database/connection");
-const { Op } = require("sequelize");
-const path = require("path");
-const Excel = require("exceljs");
-const { v4 } = require("uuid");
-const moment = require("moment-timezone");
+import sequelize from "../database/connection";
+import { Op, WhereOptions } from 'sequelize'
+import path from 'path'
+import Excel from 'exceljs'
+import { v4 } from 'uuid'
+import moment from 'moment-timezone'
+import { Request, Response } from "express";
 
-async function exportGuias(req, res) {
+const { models } = sequelize
+
+async function exportGuias(req: Request, res: Response) {
   const { desde, hasta } = req.body;
   const remitente = "";
 
 
-  const where = {
+  const where: WhereOptions<any> = {
     createdAt: {
       [Op.and]: [
         {
@@ -206,11 +209,11 @@ async function exportGuias(req, res) {
         },
       },
     ];
-    let rows = [];
+    let rows: any = [];
 
     const coldate = moment().tz("America/Bogota");
 
-    guia.forEach((element) => {
+    guia.forEach((element: any) => {
       const total =
         element.getDataValue("valorFlete") +
         element.getDataValue("valorSeguro") +
@@ -243,7 +246,7 @@ async function exportGuias(req, res) {
       ],
     ]);
     res.end(r);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -253,7 +256,7 @@ async function exportGuias(req, res) {
   }
 }
 
-async function exportUsers(req, res) {
+async function exportUsers(req: Request, res: Response) {
   const { desde, hasta } = req.body;
   const where = {
     createdAt: {
@@ -336,9 +339,9 @@ async function exportUsers(req, res) {
         },
       },
     ];
-    let rows = [];
+    let rows: any[] = [];
 
-    users.forEach((element) => {
+    users.forEach((element: any) => {
       rows.push([
         `${element.getDataValue("nombre")} ${element.getDataValue(
           "apellido"
@@ -364,7 +367,7 @@ async function exportUsers(req, res) {
       ],
     ]);
     res.end(r);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -374,7 +377,7 @@ async function exportUsers(req, res) {
   }
 }
 
-async function createXls(columns, data, desde, hasta, nombre) {
+async function createXls(columns: any, data: any, desde: any, hasta: any, nombre: any) {
   const wb = new Excel.Workbook();
   const ws = wb.addWorksheet("guias");
 
@@ -440,7 +443,7 @@ async function createXls(columns, data, desde, hasta, nombre) {
   return new Buffer(wbbuf, "base64");
 }
 
-module.exports = {
+export {
   exportGuias,
   exportUsers,
 };

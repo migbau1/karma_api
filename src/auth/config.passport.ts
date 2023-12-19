@@ -2,8 +2,15 @@ import { PassportStatic } from 'passport';
 import { Strategy, ExtractJwt } from 'passport-jwt'
 import { Strategy as LocalStrategy } from 'passport-local'
 import sequelize from '../database/connection'
+import { ModelCtor, Sequelize } from 'sequelize';
+import { ICredencialesModel } from '../database/models/Credenciales';
+import { isMatch } from '../utils/hash/password.hash';
+import { IUserModel } from '../database/models/Usuarios';
 
 const { models } = sequelize
+
+const credenciales = sequelize.model('credenciales') as ModelCtor<ICredencialesModel>
+const usuarios = sequelize.model('usuarios') as ModelCtor<IUserModel>
 
 function configPassport(passport: PassportStatic) {
   passport.use(
@@ -14,15 +21,25 @@ function configPassport(passport: PassportStatic) {
       },
       async (payload, done) => {
         try {
-          const user = await models.userCredentials.findOne({
+          const user = await usuarios.findOne({
             where: { id: payload.id },
-            attributes: ["id", "email", "name"],
+            attributes: ["nombre", "apellido", [Sequelize.col('rol_id'), 'roleId'], [Sequelize.col('credenciale.email'), 'email']],
+            include: {
+              model: credenciales,
+              attributes: []
+            },
+            raw: true
           });
 
           if (!user) {
             return done(null, false, { msg: "no hay" });
           }
-          return done(null, user.get());
+
+          return done(null, {
+            nombre: user.nombre,
+            apellido: user.apellido,
+            rol_id: user.roleId!
+          });
         } catch (error) {
           return done(error);
         }
@@ -34,32 +51,49 @@ function configPassport(passport: PassportStatic) {
     new LocalStrategy(
       { usernameField: "email", passwordField: "password" },
       async (username: string, password: string, done) => {
+        const transaction = await sequelize.transaction()
         try {
-          let user = await models.userCredentials.findOne({
+          const credentials = await credenciales.findOne({
             where: { email: username },
-            attributes: ["id", "email", "password", "name"],
-          });
-          if (!user) {
+            include: [
+              {
+                model: usuarios,
+                required: true,
+                attributes: {
+                  exclude: ['credencialeId', 'credencial_id', 'credencialId']
+                }
+              }
+            ],
+            transaction
+          })
+
+          if (!credentials) {
             return done(null, false, {
               message: "the user don't exist",
             });
           }
 
-          if (
-            user.get().password !== password ||
-            user.get().email !== username
-          ) {
+          const validate = isMatch(password, credentials.password)
+
+          if (!validate) {
             return done(null, false, {
               message: "The email or password is incorrect",
             });
           }
 
+          const tempUser = credentials.get().usuario?.get()
+
+          await transaction.commit()
+
           return done(null, {
-            id: user.getDataValue('id'),
-            email: user.getDataValue('email'),
-            name: user.getDataValue("name")
+            nombre: tempUser?.nombre!,
+            apellido: tempUser?.apellido!,
+            rol_id: tempUser?.roleId!
           });
         } catch (error) {
+          await transaction.rollback()
+          console.log(error);
+
           return done(error);
         }
       }

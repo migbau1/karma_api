@@ -1,41 +1,39 @@
 import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize, UUID, UUIDV4 } from "sequelize";
+import { IUserModel } from "./Usuarios";
 
-interface ICredentialsModel extends Model<InferAttributes<ICredentialsModel>, InferCreationAttributes<ICredentialsModel>> {
+interface ICredencialesModel extends Model<InferAttributes<ICredencialesModel>, InferCreationAttributes<ICredencialesModel>> {
   id: CreationOptional<string>
   email: string
   password: string
-  name: string
+  createdAt?: Date
+  updatedAt?: Date
+  usuario?: IUserModel
 }
 
 const credentialsModelDefiner = (sequelize: Sequelize) => {
-  sequelize.define<ICredentialsModel>('userCredentials',
+  const a = sequelize.define<ICredencialesModel>('credenciales',
     {
       id: {
+        type: UUID,
         allowNull: false,
         defaultValue: UUIDV4,
         primaryKey: true,
-        type: UUID,
       },
       email: {
+        type: DataTypes.STRING(250),
         allowNull: false,
-        type: DataTypes.TEXT,
       },
       password: {
-        allowNull: false,
         type: DataTypes.TEXT,
-      },
-      name: {
         allowNull: false,
-        type: DataTypes.TEXT,
       },
-    },
-    {
-      tableName: "userCredentials",
+      createdAt: DataTypes.DATE,
+      updatedAt: DataTypes.DATE
     }
   )
 }
 
 export {
-  ICredentialsModel,
+  ICredencialesModel,
   credentialsModelDefiner
 }

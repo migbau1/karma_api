@@ -1,17 +1,27 @@
-const { models } = require("../database/connection");
-const sequelize = require("../database/connection");
-const { Op } = require("sequelize");
-var util = require("util");
-const Producto = require("../database/models/Producto");
-const moment = require("moment-timezone");
+import sequelize from '../database/connection'
+import { Model, Op } from 'sequelize'
+import util from 'util'
+import moment from 'moment-timezone'
+import { Request, Response } from 'express'
+import { IEncomiendaModel } from '../database/models/Encomienda'
+import { IUserModel } from '../database/models/Usuarios'
+
+const { models } = sequelize
+
+// const { models } = require("../database/connection");
+// const sequelize = require("../database/connection");
+// const { Op } = require("sequelize");
+// var util = require("util");
+// const Producto = require("../database/models/Producto");
+// const moment = require("moment-timezone");
 
 const PER_PAGE = 10;
 
-function getPaginatedItems(items, offset) {
+function getPaginatedItems(items: Array<any>, offset: number) {
   return items.slice(offset, offset + PER_PAGE);
 }
 
-async function getAll(req, res) {
+async function getAll(req: Request, res: Response) {
   const t = await sequelize.transaction();
   try {
     const encomiendas = await models.encomienda.findAll({
@@ -83,7 +93,7 @@ async function getAll(req, res) {
     encomiendas != undefined ? res.send(JSON.stringify(json)) : res.send("{}");
 
     await t.commit();
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -94,7 +104,7 @@ async function getAll(req, res) {
   }
 }
 
-async function findOne(req, res) {
+async function findOne(req: Request, res: Response) {
   const t = await sequelize.transaction();
 
   try {
@@ -164,7 +174,7 @@ async function findOne(req, res) {
     encomienda != null
       ? res.send(JSON.stringify(encomienda.get()))
       : res.send("{}");
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -174,9 +184,9 @@ async function findOne(req, res) {
     await t.rollback();
   }
 }
-async function findByUbication(req, res) {
+async function findByUbication(req: Request, res: Response) {
+  const t = await sequelize.transaction();
   try {
-    const t = await sequelize.transaction();
 
     const query = await models.encomienda.findAll({
       include: [
@@ -209,7 +219,7 @@ async function findByUbication(req, res) {
     };
     await t.commit();
     res.send(JSON.stringify(json));
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -220,9 +230,9 @@ async function findByUbication(req, res) {
   }
 }
 
-async function findByDate(req, res) {
+async function findByDate(req: Request, res: Response) {
+  const t = await sequelize.transaction();
   try {
-    const t = await sequelize.transaction();
 
     const query = await models.encomienda.findAll({
       where: {
@@ -250,7 +260,7 @@ async function findByDate(req, res) {
     };
     await t.commit();
     res.send(JSON.stringify(json));
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -261,7 +271,7 @@ async function findByDate(req, res) {
   }
 }
 
-async function editGuia(req, res) {
+async function editGuia(req: Request, res: Response) {
   const t = await sequelize.transaction();
   const coldate = moment().tz("America/Bogota");
   const {
@@ -277,7 +287,7 @@ async function editGuia(req, res) {
     producto,
   } = req.body;
   try {
-    const encomienda = await models.encomienda.findByPk(req.params.id, {
+    const encomienda: any = await models.encomienda.findByPk(req.params.id, {
       include: [
         {
           model: models.usuario,
@@ -302,12 +312,12 @@ async function editGuia(req, res) {
       ],
       transaction: t,
     });
-    encomienda.destinatario.update(destinatario);
-    encomienda.remitente.update(remitente);
-    encomienda.origen.update(origen);
-    encomienda.destino.update(destino);
-    encomienda.producto.update(producto);
-    await encomienda.update({
+    encomienda!.destinatario.update(destinatario);
+    encomienda!.remitente.update(remitente);
+    encomienda!.origen.update(origen);
+    encomienda!.destino.update(destino);
+    encomienda!.producto.update(producto);
+    await encomienda!.update({
       valorSeguro: valorSeguro,
       valorFlete: valorFlete,
       recargos: recargos,
@@ -316,9 +326,9 @@ async function editGuia(req, res) {
       updatedAt: coldate.toDate(),
     });
 
-    res.send(encomienda.get());
+    res.send(encomienda!.get());
     await t.commit();
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -329,7 +339,7 @@ async function editGuia(req, res) {
   }
 }
 
-async function createOne(req, res) {
+async function createOne(req: Request, res: Response) {
   const t = await sequelize.transaction();
   const coldate = moment().tz("America/Bogota");
   try {
@@ -355,8 +365,8 @@ async function createOne(req, res) {
     let validate = await validateOrCreateUserByCc({ remitente, destinatario });
     const tempEncomienda = await models.encomienda.create(
       {
-        remitenteId: validate.remitente.id,
-        destinatarioId: validate.destinatario.id,
+        remitenteId: validate!.remitente.id,
+        destinatarioId: validate!.destinatario.id,
         origenId: ubicacionOri.getDataValue("id"),
         destinoId: ubicacionDesti.getDataValue("id"),
         productoId: pro.getDataValue("id"),
@@ -379,7 +389,7 @@ async function createOne(req, res) {
       ? res.send(JSON.stringify(tempEncomienda))
       : res.send("{}");
     await t.commit();
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.send({
       name: error.name,
@@ -390,9 +400,10 @@ async function createOne(req, res) {
   }
 }
 
-async function validateOrCreateUserByCc({ remitente, destinatario }) {
+async function validateOrCreateUserByCc({ remitente, destinatario }:
+  { remitente: IUserModel, destinatario: IUserModel }): Promise<any> {
   const t = await sequelize.transaction();
-  let response = {};
+  let response: any = {};
   try {
     const queryRemitente = await models.usuario.findOne({
       where: {
@@ -434,18 +445,12 @@ async function validateOrCreateUserByCc({ remitente, destinatario }) {
 
     await t.commit();
     return response;
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    res.send({
-      name: error.name,
-      type: error.parent.routine,
-      message: "ups, an error has occurred",
-    });
     await t.rollback();
   }
 }
-
-module.exports = {
+export {
   getAll,
   createOne,
   findOne,

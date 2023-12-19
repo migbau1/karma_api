@@ -3,11 +3,15 @@ import { Sequelize } from "sequelize";
 import { ubicationModelDefiner } from './models/Ubicacion'
 import { productoModelDefiner } from "./models/Producto";
 import { sedeModelDefiner } from "./models/Sede";
-import { userModelDefiner } from "./models/User";
+import { userModelDefiner } from "./models/Usuarios";
 import { encomiendaModelDefiner } from "./models/Encomienda";
-import { credentialsModelDefiner } from "./models/Credentials";
+import { credentialsModelDefiner } from "./models/Credenciales";
 
 import applyExtraSetup from "./extra-setup";
+import { rolesModelDefiner } from "./models/Roles";
+import { registroModelDefiner } from "./models/Registro";
+import { facturacionModelDefiner } from "./models/Facturacion";
+import { usuarioSedesModelDefiner } from "./models/UsuarioSedes";
 
 const sequelize: Sequelize = new Sequelize({
   dialect: "mysql",
@@ -18,6 +22,7 @@ const sequelize: Sequelize = new Sequelize({
   port: 3306,
   define: {
     // timestamps: false, // I do not want timestamp fields by default
+    freezeTableName: true
   },
   dialectOptions: {
     supportBigNumbers: true,
@@ -34,13 +39,16 @@ const modelDefiners = [
   productoModelDefiner,
   encomiendaModelDefiner,
   sedeModelDefiner,
-  credentialsModelDefiner
+  credentialsModelDefiner,
+  rolesModelDefiner,
+  registroModelDefiner,
+  facturacionModelDefiner,
+  usuarioSedesModelDefiner
 ];
 
 for (const modelDefiner of modelDefiners) {
   modelDefiner(sequelize);
 }
-
 applyExtraSetup(sequelize);
 
 export default sequelize;

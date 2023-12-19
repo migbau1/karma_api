@@ -1,19 +1,20 @@
 import { Router as router } from 'express'
-import { createOne, getAll, getByCedula, getRemitentes, searchEngineUser, updateUser } from '../controller/user.controller'
 import passport from 'passport'
+import {  } from '../controller/user.controller'
 
 const Router = router();
 
-Router.get("/remitentes", getRemitentes);
+// Router.get("/remitentes", getRemitentes);
 
-Router.post("/", passport.authenticate('jwt'), getAll);
+// Router.post("/", passport.authenticate('jwt'), getAll);
 
-Router.post("/:cedula", updateUser);
+// Router.post("/:cedula", updateUser);
 
-Router.get("/:cedula", getByCedula);
+// Router.get("/:cedula", getByCedula);
 
-Router.post("/api/create", createOne);
+// Router.post("/api/create", createOne);
 
-Router.post("/api/search", searchEngineUser);
+// Router.post("/api/search", searchEngineUser);
+
 
 export default Router

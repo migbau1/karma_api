@@ -13,14 +13,17 @@ import session from 'express-session'
 import userRoute from './router/user.router'
 import encomiendaRoute from './router/encomienda.router'
 import sedeRoute from './router/sede.router'
-import loginRoute from './router/login.route'
+import loginRoute from './router/access-control/login.route'
+import registerRoute from './router/access-control/register.router'
 import documentRoute from './router/generatedocument'
+import { IUserModel } from './database/models/Usuarios';
 
 const app: Express = express();
 
 const corsOptions = {
   origin: [
     "http://localhost:8081",
+    "http://localhost:3000",
     "http://anditransas.com",
     "http://217.21.78.153",
     "https://anditransas.com",
@@ -50,6 +53,7 @@ require("./auth/config.passport")(passport);
 
 app.use("/user", userRoute);
 app.use("/api/login", loginRoute);
+app.use("/api/register", registerRoute);
 app.use("/encomienda", encomiendaRoute);
 app.use("/sede", sedeRoute);
 app.use("/api/docs", documentRoute);

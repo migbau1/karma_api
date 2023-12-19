@@ -1,11 +1,12 @@
-const path = require("path");
-const fs = require("fs");
-const Excel = require("exceljs");
-const wb = new Excel.Workbook();
-const { v4 } = require("uuid");
-const moment = require("moment-timezone");
+import path from 'path'
+import Excel from 'exceljs'
+import { v4 } from 'uuid'
+import moment from 'moment-timezone'
+import { Request, Response } from 'express'
 
-async function modifyDocument(req, res) {
+const wb = new Excel.Workbook()
+
+async function modifyDocument(req: Request, res: Response) {
   let {
     remitente,
     destinatario,
@@ -43,7 +44,7 @@ async function modifyDocument(req, res) {
     const workbook = await wb.xlsx.readFile(
       path.resolve(__dirname, "../templates/TEMPLATEGUIA.xlsx")
     );
-    let ws = workbook.getWorksheet("hoja1");
+    let ws = workbook.getWorksheet("hoja1")!;
 
     //Remitente Nombre
     ws.getRow(8).getCell(2).value = (
@@ -248,7 +249,7 @@ async function modifyDocument(req, res) {
     //punto Servicio
     ws.getRow(6).getCell(5).value = sede.nombre;
     //generado por
-    ws.getRow(6).getCell(11).value = req.user.name;
+    ws.getRow(6).getCell(11).value = req.user?.name || '';
     //Factura 2===================================================
     //consecutivo
     ws.getRow(29).getCell(23).value = consecutivo;
@@ -257,7 +258,7 @@ async function modifyDocument(req, res) {
     //punto Servicio
     ws.getRow(32).getCell(5).value = sede.nombre;
     //generado por
-    ws.getRow(32).getCell(11).value = req.user.name;
+    ws.getRow(32).getCell(11).value = req.user?.name || '';
     //Factura 3===================================================
     //consecutivo
     ws.getRow(55).getCell(23).value = consecutivo;
@@ -266,7 +267,7 @@ async function modifyDocument(req, res) {
     //punto Servicio
     ws.getRow(58).getCell(5).value = sede.nombre;
     //generado por
-    ws.getRow(58).getCell(11).value = req.user.name;
+    ws.getRow(58).getCell(11).value = req.user?.name || '';
 
     //==============================================================
     //peso cob
@@ -393,4 +394,4 @@ async function modifyDocument(req, res) {
   }
 }
 
-module.exports = modifyDocument;
+export default modifyDocument;

@@ -4,8 +4,10 @@ interface IUbicationModel extends Model<InferAttributes<IUbicationModel>, InferC
     id: CreationOptional<string>
     departamento: string
     municipio: string
-    codigoPostal: number
+    codigoPostal: string
     direccion: string
+    createdAt: Date
+    updatedAt: Date
 }
 
 const ubicationModelDefiner = (sequelize: Sequelize) => {
@@ -27,12 +29,15 @@ const ubicationModelDefiner = (sequelize: Sequelize) => {
         },
         codigoPostal: {
             allowNull: false,
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
+            field: 'cod_postal'
         },
         direccion: {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        createdAt: DataTypes.DATE,
+        updatedAt: DataTypes.DATE
     })
 }
 

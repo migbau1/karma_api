@@ -6,6 +6,8 @@ interface ISedeModel extends Model<InferAttributes<ISedeModel>, InferCreationAtt
   id: CreationOptional<string>
   nombre: string
   ubicacion: IUbicationModel
+  createdAt: Date
+  updatedAt: Date
 }
 
 const sedeModelDefiner = (sequelize: Sequelize) => {
@@ -23,10 +25,15 @@ const sedeModelDefiner = (sequelize: Sequelize) => {
     ubicacion: {
       type: DataTypes.UUID,
       references: {
-        model: "ubicacion",
+        model: {
+          tableName: 'ubicacion'
+        },
         key: "id",
       },
+      field: 'ubicacion_id'
     },
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   })
 }
 

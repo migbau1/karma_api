@@ -3,15 +3,16 @@ import { IUbicationModel } from "./Ubicacion";
 
 
 interface ISedeModel extends Model<InferAttributes<ISedeModel>, InferCreationAttributes<ISedeModel>> {
-  id: CreationOptional<string>
+  id?: CreationOptional<string>
   nombre: string
-  ubicacion: IUbicationModel
-  createdAt: Date
-  updatedAt: Date
+  ubicacionId: string
+  ubicacion?: IUbicationModel
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 const sedeModelDefiner = (sequelize: Sequelize) => {
-  sequelize.define<ISedeModel>('sede', {
+  sequelize.define<ISedeModel>('sedes', {
     id: {
       allowNull: false,
       defaultValue: DataTypes.UUIDV4,
@@ -22,7 +23,7 @@ const sedeModelDefiner = (sequelize: Sequelize) => {
       allowNull: false,
       type: DataTypes.STRING(50),
     },
-    ubicacion: {
+    ubicacionId: {
       type: DataTypes.UUID,
       references: {
         model: {

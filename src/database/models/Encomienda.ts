@@ -12,10 +12,10 @@ interface IEncomiendaModel extends Model<InferAttributes<IEncomiendaModel>, Infe
   origenId: IUbicationModel
   destinoId: IUbicationModel
   productoId: IProductoModel
-  descripcion: string
+  descripcion?: string
   registro: IRegistroModel
-  createdAt: Date
-  updatedAt: Date
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 

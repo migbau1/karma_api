@@ -23,7 +23,7 @@ function configPassport(passport: PassportStatic) {
         try {
           const user = await usuarios.findOne({
             where: { id: payload.id },
-            attributes: ["nombre", "apellido", [Sequelize.col('rol_id'), 'roleId'], [Sequelize.col('credenciale.email'), 'email']],
+            attributes: ["id", "nombre", "apellido", [Sequelize.col('rol_id'), 'roleId'], [Sequelize.col('credenciale.email'), 'email']],
             include: {
               model: credenciales,
               attributes: []
@@ -36,6 +36,7 @@ function configPassport(passport: PassportStatic) {
           }
 
           return done(null, {
+            id: user.id,
             nombre: user.nombre,
             apellido: user.apellido,
             rol_id: user.roleId!
@@ -86,6 +87,7 @@ function configPassport(passport: PassportStatic) {
           await transaction.commit()
 
           return done(null, {
+            id: tempUser?.id,
             nombre: tempUser?.nombre!,
             apellido: tempUser?.apellido!,
             rol_id: tempUser?.roleId!
@@ -105,8 +107,8 @@ function configPassport(passport: PassportStatic) {
   });
   passport.deserializeUser(async (user: any, done) => {
     try {
-      let usuario: any = await models.userCredentials.findByPk(user.id, {
-        attributes: ["id", "email", "name"],
+      let usuario: any = await usuarios.findByPk(user.id, {
+        attributes: ["id", "nombre", "apellido", "rol_id"],
       });
       return done(null, usuario.get());
     } catch (error) {

@@ -17,7 +17,7 @@ function applyExtraSetup(sequelize: Sequelize): void {
     ubicacion,
     productos,
     encomiendas,
-    sede,
+    sedes,
     credenciales,
     roles,
     registro_encomiendas,
@@ -28,7 +28,7 @@ function applyExtraSetup(sequelize: Sequelize): void {
     ['ubicacion']: ModelCtor<IUbicationModel>,
     ['productos']: ModelCtor<IProductoModel>,
     ['encomiendas']: ModelCtor<IEncomiendaModel>,
-    ['sede']: ModelCtor<ISedeModel>,
+    ['sedes']: ModelCtor<ISedeModel>,
     ['credenciales']: ModelCtor<ICredencialesModel>,
     ['roles']: ModelCtor<IRolesModel>,
     ['registro_encomiendas']: ModelCtor<IRegistroModel>,
@@ -40,11 +40,89 @@ function applyExtraSetup(sequelize: Sequelize): void {
   usuarios.belongsTo(roles)
 
   ubicacion.hasOne(usuarios)
-  usuarios.belongsToMany(ubicacion, { through: { model: usuarios }, foreignKey: 'id' })
+  usuarios.belongsTo(ubicacion)
 
   credenciales.hasOne(usuarios, { foreignKey: 'credencial_id' })
   usuarios.belongsTo(credenciales, { foreignKey: 'credencial_id' })
 
+  ubicacion.hasOne(sedes)
+  sedes.belongsTo(ubicacion)
+
+  usuarios.belongsToMany(sedes, { through: 'usuario_sedes' })
+  sedes.belongsToMany(usuarios, { through: 'usuario_sedes' })
+
+  usuarios.hasMany(encomiendas, {
+    as: 'remitente',
+    foreignKey: {
+      name: "remitente_id",
+      allowNull: false
+    }
+  })
+  usuarios.hasMany(encomiendas, {
+    as: 'destinatario',
+    foreignKey: {
+      name: "destinatario_id",
+      allowNull: false
+    }
+  })
+
+  encomiendas.belongsTo(usuarios, {
+    as: 'remitente',
+    foreignKey: {
+      name: "remitente_id",
+      allowNull: false
+    }
+  })
+
+  encomiendas.belongsTo(usuarios, {
+    as: 'destinatario',
+    foreignKey: {
+      name: "destinatario_id",
+      allowNull: false
+    }
+  })
+
+
+
+  ubicacion.hasMany(encomiendas, {
+    as: 'origen',
+    foreignKey: {
+      name: "origen_id",
+      allowNull: false
+    }
+  })
+  ubicacion.hasMany(encomiendas, {
+    as: 'destino',
+    foreignKey: {
+      name: "destino_id",
+      allowNull: false
+    }
+  })
+
+  encomiendas.belongsTo(ubicacion, {
+    as: 'origen',
+    foreignKey: {
+      name: "origen_id",
+      allowNull: false
+    }
+  })
+
+  encomiendas.belongsTo(ubicacion, {
+    as: 'destino',
+    foreignKey: {
+      name: "destino_id",
+      allowNull: false
+    }
+  })
+
+  productos.hasOne(encomiendas)
+  encomiendas.belongsTo(productos)
+
+  usuarios.hasMany(registro_encomiendas)
+  sedes.hasOne(registro_encomiendas)
+
+  registro_encomiendas.belongsTo(usuarios)
+  registro_encomiendas.belongsTo(sedes)
 }
 
 export default applyExtraSetup

@@ -4,10 +4,10 @@ import { ISedeModel } from "./Sede";
 
 
 interface IUsuarioSedesModel extends Model<InferAttributes<IUsuarioSedesModel>, InferCreationAttributes<IUsuarioSedesModel>> {
-    usuario: IUserModel
-    sede: ISedeModel
-    createdAt: Date
-    updatedAt: Date
+    usuario: string
+    sede: string
+    createdAt?: Date
+    updatedAt?: Date
 }
 
 const usuarioSedesModelDefiner = (sequelize: Sequelize) => {

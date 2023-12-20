@@ -1,20 +1,18 @@
 import { Router as router } from 'express'
 import passport from 'passport'
-import {  } from '../controller/user.controller'
+import { createOne, findAll, findOne, updateOne } from '../controller/user.controller'
+import { checkUserRole } from '../controller/access-control/login.controller';
+import Roles from '../utils/roles/roles.pointer';
 
 const Router = router();
 
-// Router.get("/remitentes", getRemitentes);
+Router.get('/', passport.authenticate('jwt'), checkUserRole([Roles.admin]), findAll)
 
-// Router.post("/", passport.authenticate('jwt'), getAll);
+Router.get('/:id', passport.authenticate('jwt'), checkUserRole([Roles.admin]), findOne)
 
-// Router.post("/:cedula", updateUser);
+Router.post('/create', passport.authenticate('jwt'), checkUserRole([Roles.admin]), createOne)
 
-// Router.get("/:cedula", getByCedula);
-
-// Router.post("/api/create", createOne);
-
-// Router.post("/api/search", searchEngineUser);
+Router.put('/update', passport.authenticate('jwt'), checkUserRole([Roles.admin, Roles.cliente]), updateOne)
 
 
 export default Router

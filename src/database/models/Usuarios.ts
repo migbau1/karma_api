@@ -1,4 +1,5 @@
 import { CreationOptional, InferAttributes, InferCreationAttributes, Model, Sequelize, UUIDV4, UUID, DataTypes } from "sequelize"
+import { IUbicationModel } from "./Ubicacion"
 
 interface IUserModel extends Model<InferAttributes<IUserModel>, InferCreationAttributes<IUserModel>> {
     id?: CreationOptional<string>
@@ -11,6 +12,7 @@ interface IUserModel extends Model<InferAttributes<IUserModel>, InferCreationAtt
     credencialId?: string
     createdAt?: Date
     updatedAt?: Date
+    ubicacion?: IUbicationModel
 }
 
 const userModelDefiner = (sequelize: Sequelize) => {
@@ -69,7 +71,8 @@ const userModelDefiner = (sequelize: Sequelize) => {
         },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE
-    }
+    },
+        { freezeTableName: true }
     )
 }
 export {

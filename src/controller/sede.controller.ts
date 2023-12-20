@@ -1,15 +1,26 @@
 import { Request, Response } from "express";
 import sequelize from "../database/connection";
+import { ModelCtor } from "sequelize";
+import { ISedeModel } from "../database/models/Sede";
+import { IUbicationModel } from "../database/models/Ubicacion";
+import ISedeUpdateDto from "../dto/sedes/update.dto";
+import ISedeCreateDto from "../dto/sedes/create.dto";
+import { IUsuarioSedesModel } from "../database/models/UsuarioSedes";
+import IUsuarioSedeDto from "../dto/usuario-sedes/create.dto";
 
-const { models } = sequelize
+const sedesModel = sequelize.model('sedes') as ModelCtor<ISedeModel>
+const ubicacionModel = sequelize.model('ubicacion') as ModelCtor<IUbicationModel>
+const usuarioSedeModel = sequelize.model('usuario_sedes') as ModelCtor<IUsuarioSedesModel>
 
 async function getAll(req: Request, res: Response) {
+  const transaction = await sequelize.transaction()
   try {
-    const sede = await models.sede.findAll();
-
-    sede != undefined ? res.send(JSON.stringify(sede)) : res.send("{}");
+    const tmpSedes = await sedesModel.findAll({ transaction });
+    await transaction.commit()
+    res.send(tmpSedes)
   } catch (error: any) {
     console.error(error);
+    await transaction.rollback()
     res.send({
       name: error.name,
       type: error.parent.routine,
@@ -19,19 +30,27 @@ async function getAll(req: Request, res: Response) {
 }
 
 async function createOne(req: Request, res: Response) {
+  const { nombre, ubicacion } = req.body as ISedeCreateDto
+  const transaction = await sequelize.transaction()
   try {
-    const sede = req.body.data;
 
-    const ubicacion = await models.ubicacion.create(sede.ubicacion);
+    const tmpUbicacion = await ubicacionModel.create({
+      departamento: ubicacion.departamento,
+      municipio: ubicacion.municipio,
+      direccion: ubicacion.direccion,
+      codigoPostal: ubicacion.cod_postal
+    }, { transaction })
 
-    const sedes = await models.sede.create({
-      nombre: sede.nombre,
-      ubicacion: ubicacion.getDataValue('id')
-    });
+    const tmpSede = await sedesModel.create({
+      nombre,
+      ubicacionId: tmpUbicacion.id
+    }, { transaction });
 
-    sede != undefined ? res.send(JSON.stringify(sedes)) : res.send("{}");
+    await transaction.commit()
+    res.send(tmpSede)
   } catch (error: any) {
     console.error(error);
+    await transaction.rollback()
     res.send({
       name: error.name,
       type: error.parent.routine,
@@ -40,4 +59,56 @@ async function createOne(req: Request, res: Response) {
   }
 }
 
-export { getAll, createOne };
+const updateOne = async (req: Request, res: Response) => {
+  const transaction = await sequelize.transaction()
+  const { nombre, ubicacion, id } = req.body as ISedeUpdateDto
+  try {
+
+    const tmpSede = await sedesModel.findByPk(id, {
+      include: {
+        model: ubicacionModel
+      }, transaction
+    })
+
+    if (tmpSede) {
+      tmpSede.nombre = nombre
+
+      if (tmpSede.ubicacion) {
+        tmpSede.ubicacion.departamento = ubicacion.departamento
+        tmpSede.ubicacion.municipio = ubicacion.municipio
+        tmpSede.ubicacion.direccion = ubicacion.direccion
+        tmpSede.ubicacion.codigoPostal = ubicacion.cod_postal
+      }
+
+      await tmpSede.save({ transaction })
+    }
+
+    await transaction.commit()
+    res.send(tmpSede)
+  } catch (error) {
+    await transaction.rollback()
+    console.log(error);
+    res.send(error)
+  }
+}
+
+const assignSede = async (req: Request, res: Response) => {
+  const transaction = await sequelize.transaction()
+  const { sedeId, usuarioId } = req.body as IUsuarioSedeDto
+  try {
+
+    const tmpUsuarioSede = await usuarioSedeModel.create({
+      usuario: usuarioId,
+      sede: sedeId
+    }, { transaction })
+
+    await transaction.commit()
+
+    res.send(tmpUsuarioSede)
+  } catch (error) {
+    await transaction.rollback()
+    res.send(error)
+  }
+}
+
+export { getAll, createOne, updateOne, assignSede };

@@ -6,8 +6,8 @@ interface IUbicationModel extends Model<InferAttributes<IUbicationModel>, InferC
     municipio: string
     codigoPostal: string
     direccion: string
-    createdAt: Date
-    updatedAt: Date
+    createdAt?: Date
+    updatedAt?: Date
 }
 
 const ubicationModelDefiner = (sequelize: Sequelize) => {
@@ -38,7 +38,10 @@ const ubicationModelDefiner = (sequelize: Sequelize) => {
         },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE
-    })
+    }, { freezeTableName: true, name: {
+        singular: 'ubicacion',
+        plural: 'ubicacion'
+    } })
 }
 
 export {

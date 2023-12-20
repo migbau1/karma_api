@@ -5,8 +5,8 @@ import { IUserModel } from "./Usuarios";
 
 interface IRegistroModel extends Model<InferAttributes<IRegistroModel>, InferCreationAttributes<IRegistroModel>> {
     id: CreationOptional<string>
-    sede: ISedeModel
-    usuario: IUserModel
+    sedeId: string
+    usuarioId: string
     createdAt: Date
     updatedAt: Date
 }
@@ -19,7 +19,7 @@ const registroModelDefiner = (sequelize: Sequelize) => {
             primaryKey: true,
             defaultValue: UUIDV4
         },
-        sede: {
+        sedeId: {
             type: UUID,
             references: {
                 model: {
@@ -29,7 +29,7 @@ const registroModelDefiner = (sequelize: Sequelize) => {
             },
             field: 'sede_id'
         },
-        usuario: {
+        usuarioId: {
             type: UUID,
             references: {
                 model: {

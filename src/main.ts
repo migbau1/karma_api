@@ -51,11 +51,11 @@ app.use(passport.session());
 
 require("./auth/config.passport")(passport);
 
-app.use("/user", userRoute);
+app.use("/api/user", userRoute);
 app.use("/api/login", loginRoute);
 app.use("/api/register", registerRoute);
-app.use("/encomienda", encomiendaRoute);
-app.use("/sede", sedeRoute);
+app.use("/api/encomienda", encomiendaRoute);
+app.use("/api/sede", sedeRoute);
 app.use("/api/docs", documentRoute);
 
 

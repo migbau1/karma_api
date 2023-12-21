@@ -121,21 +121,21 @@ module.exports = {
           field: 'tipo_producto'
         },
         cantidad: {
-          type: Sequelize.DECIMAL(10, 3),
+          type: Sequelize.DECIMAL(10, 2),
           allowNull: false,
           defaultValue: 0
         },
-        peso: Sequelize.DECIMAL(10, 3),
+        peso: Sequelize.DECIMAL(10, 2),
         pesoCobrar: {
-          type: Sequelize.DECIMAL(10, 3),
+          type: Sequelize.DECIMAL(10, 2),
           field: 'peso_cobrar'
         },
         pesoVol: {
-          type: Sequelize.DECIMAL(10, 3),
+          type: Sequelize.DECIMAL(10, 2),
           field: 'peso_vol'
         },
         valorDeclarado: {
-          type: Sequelize.DECIMAL(10, 3),
+          type: Sequelize.DECIMAL(10, 2),
           field: 'valor_declarado'
         },
         createdAt: Sequelize.DATE,
@@ -199,9 +199,9 @@ module.exports = {
               tableName: 'productos'
             },
             key: 'id',
-            allowNull: false,
-            field: 'producto_id'
-          }
+          },
+          allowNull: false,
+          field: 'producto_id'
         },
         registro: {
           type: Sequelize.UUID,
@@ -211,8 +211,8 @@ module.exports = {
             },
             key: 'id',
             allowNull: false,
-            field: 'registro_id'
-          }
+          },
+          field: 'registro_id'
         },
         descripcion: Sequelize.STRING,
         createdAt: Sequelize.DATE,
@@ -237,19 +237,19 @@ module.exports = {
           field: 'encomienda_id'
         },
         valorSeguro: {
-          type: Sequelize.DECIMAL(10, 3),
+          type: Sequelize.DECIMAL(10, 2),
           field: 'valor_seguro'
         },
         valorFlete: {
-          type: Sequelize.DECIMAL(10, 3),
+          type: Sequelize.DECIMAL(10, 2),
           field: 'valor_flete'
         },
         otrosCobros: {
-          type: Sequelize.DECIMAL(10, 3),
+          type: Sequelize.DECIMAL(10, 2),
           field: 'otros_cobros'
         },
-        recargos: Sequelize.DECIMAL(10, 3),
-        descuentos: Sequelize.DECIMAL(10, 3),
+        recargos: Sequelize.DECIMAL(10, 2),
+        descuentos: Sequelize.DECIMAL(10, 2),
         createdAt: Sequelize.DATE,
         updatedAt: Sequelize.DATE
       }, { transaction })

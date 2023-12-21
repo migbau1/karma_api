@@ -1,5 +1,5 @@
 interface IFacturacionCreateDto {
-    encomienda: string;
+    encomienda?: string;
     valorSeguro: number
     valorFlete: number
     otrosCobros: number

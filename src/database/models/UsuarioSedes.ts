@@ -4,15 +4,15 @@ import { ISedeModel } from "./Sede";
 
 
 interface IUsuarioSedesModel extends Model<InferAttributes<IUsuarioSedesModel>, InferCreationAttributes<IUsuarioSedesModel>> {
-    usuario: string
-    sede: string
+    usuarioId: string
+    sedeId: string
     createdAt?: Date
     updatedAt?: Date
 }
 
 const usuarioSedesModelDefiner = (sequelize: Sequelize) => {
     sequelize.define<IUsuarioSedesModel>('usuario_sedes', {
-        usuario: {
+        usuarioId: {
             type: UUID,
             primaryKey: true,
             references: {
@@ -21,7 +21,7 @@ const usuarioSedesModelDefiner = (sequelize: Sequelize) => {
             },
             field: 'usuario_id'
         },
-        sede: {
+        sedeId: {
             type: UUID,
             primaryKey: true,
             references: {

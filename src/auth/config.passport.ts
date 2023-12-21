@@ -6,11 +6,13 @@ import { ModelCtor, Sequelize } from 'sequelize';
 import { ICredencialesModel } from '../database/models/Credenciales';
 import { isMatch } from '../utils/hash/password.hash';
 import { IUserModel } from '../database/models/Usuarios';
+import { ISedeModel } from '../database/models/Sede';
 
 const { models } = sequelize
 
 const credenciales = sequelize.model('credenciales') as ModelCtor<ICredencialesModel>
 const usuarios = sequelize.model('usuarios') as ModelCtor<IUserModel>
+const usuarioSedeModel = sequelize.model('usuario_sedes') as ModelCtor<ISedeModel>
 
 function configPassport(passport: PassportStatic) {
   passport.use(
@@ -21,13 +23,24 @@ function configPassport(passport: PassportStatic) {
       },
       async (payload, done) => {
         try {
-          const user = await usuarios.findOne({
+          const user: any = await usuarios.findOne({
             where: { id: payload.id },
-            attributes: ["id", "nombre", "apellido", [Sequelize.col('rol_id'), 'roleId'], [Sequelize.col('credenciale.email'), 'email']],
-            include: {
-              model: credenciales,
-              attributes: []
-            },
+            attributes: [
+              "id",
+              "nombre", "apellido",
+              [Sequelize.col('rol_id'), 'roleId'],
+              [Sequelize.col('credenciale.email'), 'email'],
+              [Sequelize.col('usuario_sede.sede_id'), 'sedeId']
+            ],
+            include: [
+              {
+                model: credenciales,
+                attributes: []
+              },
+              {
+                model: usuarioSedeModel
+              }
+            ],
             raw: true
           });
 
@@ -39,9 +52,11 @@ function configPassport(passport: PassportStatic) {
             id: user.id,
             nombre: user.nombre,
             apellido: user.apellido,
-            rol_id: user.roleId!
+            rol_id: user.roleId!,
+            sedeId: user.sedeId
           });
         } catch (error) {
+          console.log(error);
           return done(error);
         }
       }
@@ -62,7 +77,10 @@ function configPassport(passport: PassportStatic) {
                 required: true,
                 attributes: {
                   exclude: ['credencialeId', 'credencial_id', 'credencialId']
-                }
+                },
+                include: [{
+                  model: usuarioSedeModel
+                }]
               }
             ],
             transaction
@@ -90,7 +108,8 @@ function configPassport(passport: PassportStatic) {
             id: tempUser?.id,
             nombre: tempUser?.nombre!,
             apellido: tempUser?.apellido!,
-            rol_id: tempUser?.roleId!
+            rol_id: tempUser?.roleId!,
+            sedeId: tempUser?.usuarioSede?.usuarioId!
           });
         } catch (error) {
           await transaction.rollback()

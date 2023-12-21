@@ -4,14 +4,15 @@ import { IEncomiendaModel } from "./Encomienda";
 
 interface IFacturacionModel extends Model<InferAttributes<IFacturacionModel>, InferCreationAttributes<IFacturacionModel>> {
     id: CreationOptional<string>
-    encomienda: IEncomiendaModel
+    encomiendaId: string
     valorSeguro: number
     valorFlete: number
     otrosCobros: number
     recargos: number
     descuentos: number
-    createdAt: Date
-    updatedAt: Date
+    createdAt?: Date
+    updatedAt?  : Date
+    encomienda?: IEncomiendaModel
 }
 
 const facturacionModelDefiner = (sequelize: Sequelize) => {
@@ -21,7 +22,7 @@ const facturacionModelDefiner = (sequelize: Sequelize) => {
             primaryKey: true,
             defaultValue: UUIDV4
         },
-        encomienda: {
+        encomiendaId: {
             type: UUID,
             references: {
                 model: 'encomiendas',
@@ -30,21 +31,21 @@ const facturacionModelDefiner = (sequelize: Sequelize) => {
             field: 'encomienda_id',
         },
         valorSeguro: {
-            type: DataTypes.DECIMAL(10, 3),
+            type: DataTypes.DECIMAL(10, 2),
             field: 'valor_seguro',
         },
         valorFlete: {
-            type: DataTypes.DECIMAL(10, 3),
+            type: DataTypes.DECIMAL(10, 2),
             field: 'valor_flete',
         },
         otrosCobros: {
-            type: DataTypes.DECIMAL(10, 3),
+            type: DataTypes.DECIMAL(10, 2),
             field: 'otros_cobros',
         },
         recargos: {
-            type: DataTypes.DECIMAL(10, 3),
+            type: DataTypes.DECIMAL(10, 2),
         },
-        descuentos: DataTypes.DECIMAL(10, 3),
+        descuentos: DataTypes.DECIMAL(10, 2),
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE
     })

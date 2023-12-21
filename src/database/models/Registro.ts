@@ -7,8 +7,8 @@ interface IRegistroModel extends Model<InferAttributes<IRegistroModel>, InferCre
     id: CreationOptional<string>
     sedeId: string
     usuarioId: string
-    createdAt: Date
-    updatedAt: Date
+    createdAt?: Date
+    updatedAt?: Date
 }
 
 

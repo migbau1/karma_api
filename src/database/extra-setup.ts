@@ -48,8 +48,9 @@ function applyExtraSetup(sequelize: Sequelize): void {
   ubicacion.hasOne(sedes)
   sedes.belongsTo(ubicacion)
 
-  usuarios.belongsToMany(sedes, { through: 'usuario_sedes' })
-  sedes.belongsToMany(usuarios, { through: 'usuario_sedes' })
+  // usuarios.belongsToMany(sedes, { through: 'usuario_sedes', foreignKey: 'usuario_id' })
+  usuarios.belongsTo(usuario_sedes, { foreignKey: 'id' })
+  sedes.belongsToMany(usuarios, { through: 'usuario_sedes', foreignKey: 'sede_id' })
 
   usuarios.hasMany(encomiendas, {
     as: 'remitente',
@@ -81,7 +82,6 @@ function applyExtraSetup(sequelize: Sequelize): void {
       allowNull: false
     }
   })
-
 
 
   ubicacion.hasMany(encomiendas, {
@@ -123,6 +123,9 @@ function applyExtraSetup(sequelize: Sequelize): void {
 
   registro_encomiendas.belongsTo(usuarios)
   registro_encomiendas.belongsTo(sedes)
+
+  encomiendas.hasOne(facturacion)
+  facturacion.belongsTo((encomiendas))
 }
 
 export default applyExtraSetup

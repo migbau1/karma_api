@@ -10,7 +10,6 @@ interface IEncomiendaCreateDto {
     destino: IUbicacionDto
     producto: IProductoCreateDto
     facturacion: IFacturacionCreateDto
-    registro: IRegistroEncomiendaDto
     descripcion: string
 }
 

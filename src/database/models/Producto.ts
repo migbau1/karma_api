@@ -10,8 +10,8 @@ interface IProductoModel extends Model<InferAttributes<IProductoModel>, InferCre
   pesoCob: number
   pesoVol: number
   valorDeclarado: number
-  createdAt: Date
-  updatedAt: Date
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 const productoModelDefiner = (sequelize: Sequelize) => {
@@ -35,25 +35,25 @@ const productoModelDefiner = (sequelize: Sequelize) => {
       field: 'tipo_producto',
     },
     peso: {
-      type: DataTypes.DECIMAL(10, 3),
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
     cantidad: {
-      type: DataTypes.DECIMAL(10, 3),
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
     pesoCob: {
-      type: DataTypes.DECIMAL(10, 3),
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
       field: 'peso_cobrar'
     },
     pesoVol: {
-      type: DataTypes.DECIMAL(10, 3),
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
       field: 'peso_vol'
     },
     valorDeclarado: {
-      type: DataTypes.DECIMAL(10, 3),
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
       field: 'valor_declarado'
     },

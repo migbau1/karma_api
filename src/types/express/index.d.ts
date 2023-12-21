@@ -4,5 +4,6 @@ declare namespace Express {
         rol_id: string;
         nombre: string;
         apellido: string;
+        sedeId: string;
     }
 }

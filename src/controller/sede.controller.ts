@@ -98,8 +98,8 @@ const assignSede = async (req: Request, res: Response) => {
   try {
 
     const tmpUsuarioSede = await usuarioSedeModel.create({
-      usuario: usuarioId,
-      sede: sedeId
+      usuarioId: usuarioId,
+      sedeId: sedeId
     }, { transaction })
 
     await transaction.commit()

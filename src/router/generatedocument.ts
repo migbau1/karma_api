@@ -1,14 +1,13 @@
 import { Router as router } from 'express'
 import passport from 'passport'
-// import docsController from '../utils/xlsxutil'
+import exportEncomienda from '../utils/xlsxutil';
 // import { exportGuias, exportUsers } from '../controller/exports.controller'
 
 const Router = router()
-// const passport = require("passport");
-// const docsController = require("../utils/xlsxutil");
-// const controller = require("../controller/exports.controller");
 
-// Router.post("/", passport.authenticate("jwt"), docsController);
+Router.get("/:id", passport.authenticate("jwt"), exportEncomienda);
+
+
 // Router.post(
 //   "/reporteusuarios",
 //   passport.authenticate("jwt"),

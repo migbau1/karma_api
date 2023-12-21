@@ -35,27 +35,27 @@ const productoModelDefiner = (sequelize: Sequelize) => {
       field: 'tipo_producto',
     },
     peso: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.DOUBLE,
       allowNull: false,
     },
     cantidad: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.DOUBLE,
       allowNull: false,
     },
     pesoCob: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.DOUBLE,
       allowNull: true,
-      field: 'peso_cobrar'
+      field: 'peso_cobrar',
     },
     pesoVol: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.DOUBLE,
       allowNull: true,
-      field: 'peso_vol'
+      field: 'peso_vol',
     },
     valorDeclarado: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.DOUBLE,
       allowNull: true,
-      field: 'valor_declarado'
+      field: 'valor_declarado',
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE

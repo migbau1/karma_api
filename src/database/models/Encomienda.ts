@@ -3,6 +3,8 @@ import { IUbicationModel } from "./Ubicacion";
 import { IUserModel } from "./Usuarios";
 import { IProductoModel } from "./Producto";
 import { IRegistroModel } from "./Registro";
+import { IFacturacionModel } from "./Facturacion";
+import { ISedeModel } from "./Sede";
 
 interface IEncomiendaModel extends Model<InferAttributes<IEncomiendaModel>, InferCreationAttributes<IEncomiendaModel>> {
   id: CreationOptional<string>
@@ -17,11 +19,13 @@ interface IEncomiendaModel extends Model<InferAttributes<IEncomiendaModel>, Infe
   updatedAt?: Date
 
   remitente?: IUserModel
-  destinario?: IUserModel
+  destinatario?: IUserModel
   origen?: IUbicationModel
   destino?: IUbicationModel
   producto?: IProductoModel
   registro?: IRegistroModel
+  facturacion?: IFacturacionModel
+  sede?: ISedeModel
 }
 
 

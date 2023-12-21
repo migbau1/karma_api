@@ -1,7 +1,7 @@
-// import sequelize from "../database/connection";
+import sequelize from "../database/connection";
+import Excel from 'exceljs'
 // import { Op, WhereOptions } from 'sequelize'
 // import path from 'path'
-// import Excel from 'exceljs'
 // import { v4 } from 'uuid'
 // import moment from 'moment-timezone'
 // import { Request, Response } from "express";
@@ -378,69 +378,69 @@
 // }
 
 // async function createXls(columns: any, data: any, desde: any, hasta: any, nombre: any) {
-//   const wb = new Excel.Workbook();
-//   const ws = wb.addWorksheet("guias");
+//     const wb = new Excel.Workbook();
+//     const ws = wb.addWorksheet("guias");
 
-//   ws.columns = columns;
+//     ws.columns = columns;
 
-//   ws.addRows(data);
-//   ws.insertRow(1, [
-//     `${nombre} GENERAD@S DESDE ${desde} HASTA ${hasta}`,
-//   ]).commit();
-//   ws.getCell("A1").alignment = {
-//     horizontal: "center",
-//   };
-//   if (nombre === "GUIAS") {
-//     ws.mergeCells("A1:N1");
-//     ws.autoFilter = "A2:N2";
-//   } else {
-//     ws.mergeCells("A1:F1");
-//     ws.autoFilter = "A2:F2";
-//   }
+//     ws.addRows(data);
+//     ws.insertRow(1, [
+//         `${nombre} GENERAD@S DESDE ${desde} HASTA ${hasta}`,
+//     ]).commit();
+//     ws.getCell("A1").alignment = {
+//         horizontal: "center",
+//     };
+//     if (nombre === "GUIAS") {
+//         ws.mergeCells("A1:N1");
+//         ws.autoFilter = "A2:N2";
+//     } else {
+//         ws.mergeCells("A1:F1");
+//         ws.autoFilter = "A2:F2";
+//     }
 
-//   ws.eachRow({ includeEmpty: true }, (row, rowNumber) => {
-//     row.eachCell((cell, colNumber) => {
-//       if (rowNumber === 1) {
-//         cell.fill = {
-//           type: "pattern",
-//           pattern: "solid",
-//           fgColor: { argb: "ff0000" },
-//         };
-//         cell.font = {
-//           color: { argb: "ffffff" },
-//         };
-//       }
-//       if (rowNumber == 2) {
-//         // First set the background of header row
-//         cell.fill = {
-//           type: "pattern",
-//           pattern: "solid",
-//           fgColor: { argb: "f5b914" },
-//         };
-//       }
-//       if (nombre == "GUIAS" && colNumber === 8 && rowNumber > 2) {
-//         cell.fill = {
-//           type: "pattern",
-//           pattern: "solid",
-//           fgColor: { argb: "FFFFFF00" },
-//         };
-//       }
-//       // Set border of each cell
-//       cell.border = {
-//         top: { style: "thin" },
-//         left: { style: "thin" },
-//         bottom: { style: "thin" },
-//         right: { style: "thin" },
-//       };
+//     ws.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+//         row.eachCell((cell, colNumber) => {
+//             if (rowNumber === 1) {
+//                 cell.fill = {
+//                     type: "pattern",
+//                     pattern: "solid",
+//                     fgColor: { argb: "ff0000" },
+//                 };
+//                 cell.font = {
+//                     color: { argb: "ffffff" },
+//                 };
+//             }
+//             if (rowNumber == 2) {
+//                 // First set the background of header row
+//                 cell.fill = {
+//                     type: "pattern",
+//                     pattern: "solid",
+//                     fgColor: { argb: "f5b914" },
+//                 };
+//             }
+//             if (nombre == "GUIAS" && colNumber === 8 && rowNumber > 2) {
+//                 cell.fill = {
+//                     type: "pattern",
+//                     pattern: "solid",
+//                     fgColor: { argb: "FFFFFF00" },
+//                 };
+//             }
+//             // Set border of each cell
+//             cell.border = {
+//                 top: { style: "thin" },
+//                 left: { style: "thin" },
+//                 bottom: { style: "thin" },
+//                 right: { style: "thin" },
+//             };
+//         });
+//         //Commit the changed row to the stream
+//         row.commit();
 //     });
-//     //Commit the changed row to the stream
-//     row.commit();
-//   });
-//   const wbbuf = await wb.xlsx.writeBuffer({
-//     filename: path.resolve(__dirname, `../templates/${v4().toString()}.xlsx`),
-//   });
+//     const wbbuf = await wb.xlsx.writeBuffer({
+//         filename: path.resolve(__dirname, `../templates/${v4().toString()}.xlsx`),
+//     });
 
-//   return new Buffer(wbbuf, "base64");
+//     return new Buffer(wbbuf, "base64");
 // }
 
 // export {

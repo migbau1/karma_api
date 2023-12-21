@@ -13,7 +13,10 @@ module.exports = {
         },
         nombre: Sequelize.STRING,
         apellido: Sequelize.STRING,
-        cedula: Sequelize.STRING,
+        cedula: {
+          type: Sequelize.STRING,
+          unique: true,
+        },
         telefono: Sequelize.STRING,
         rolId: {
           type: Sequelize.UUID,
@@ -50,6 +53,8 @@ module.exports = {
         createdAt: Sequelize.DATE,
         updatedAt: Sequelize.DATE
       }, { transaction })
+      
+      await queryInterface.addIndex('usuarios', ['cedula'], { transaction })
 
       await queryInterface.createTable('sedes', {
         id: {
@@ -57,7 +62,10 @@ module.exports = {
           primaryKey: true,
           defaultValue: Sequelize.UUIDV4
         },
-        nombre: Sequelize.STRING,
+        nombre: {
+          type: Sequelize.STRING,
+          unique: true,
+        },
         ubicacionId: {
           type: Sequelize.UUID,
           references: {
@@ -72,6 +80,8 @@ module.exports = {
         createdAt: Sequelize.DATE,
         updatedAt: Sequelize.DATE
       }, { transaction })
+
+      await queryInterface.addIndex('sedes', ['nombre'], { transaction })
 
       await queryInterface.createTable('registro_encomiendas', {
         id: {
@@ -121,21 +131,21 @@ module.exports = {
           field: 'tipo_producto'
         },
         cantidad: {
-          type: Sequelize.DECIMAL(10, 2),
+          type: Sequelize.DOUBLE,
           allowNull: false,
           defaultValue: 0
         },
-        peso: Sequelize.DECIMAL(10, 2),
+        peso: Sequelize.DOUBLE,
         pesoCobrar: {
-          type: Sequelize.DECIMAL(10, 2),
+          type: Sequelize.DOUBLE,
           field: 'peso_cobrar'
         },
         pesoVol: {
-          type: Sequelize.DECIMAL(10, 2),
+          type: Sequelize.DOUBLE,
           field: 'peso_vol'
         },
         valorDeclarado: {
-          type: Sequelize.DECIMAL(10, 2),
+          type: Sequelize.DOUBLE,
           field: 'valor_declarado'
         },
         createdAt: Sequelize.DATE,
@@ -234,25 +244,29 @@ module.exports = {
             key: 'id',
           },
           allowNull: false,
-          field: 'encomienda_id'
+          field: 'encomienda_id',
+          unique: true
         },
         valorSeguro: {
-          type: Sequelize.DECIMAL(10, 2),
+          type: Sequelize.DOUBLE,
           field: 'valor_seguro'
         },
         valorFlete: {
-          type: Sequelize.DECIMAL(10, 2),
+          type: Sequelize.DOUBLE,
           field: 'valor_flete'
         },
         otrosCobros: {
-          type: Sequelize.DECIMAL(10, 2),
+          type: Sequelize.DOUBLE,
           field: 'otros_cobros'
         },
-        recargos: Sequelize.DECIMAL(10, 2),
-        descuentos: Sequelize.DECIMAL(10, 2),
+        recargos: Sequelize.DOUBLE,
+        descuentos: Sequelize.DOUBLE,
         createdAt: Sequelize.DATE,
         updatedAt: Sequelize.DATE
       }, { transaction })
+
+      
+      await queryInterface.addIndex('facturacion', ['encomienda_id'], { transaction })
 
       /**
        * Relacion entre sede y usuario

@@ -11,7 +11,7 @@ interface IFacturacionModel extends Model<InferAttributes<IFacturacionModel>, In
     recargos: number
     descuentos: number
     createdAt?: Date
-    updatedAt?  : Date
+    updatedAt?: Date
     encomienda?: IEncomiendaModel
 }
 
@@ -31,21 +31,23 @@ const facturacionModelDefiner = (sequelize: Sequelize) => {
             field: 'encomienda_id',
         },
         valorSeguro: {
-            type: DataTypes.DECIMAL(10, 2),
-            field: 'valor_seguro',
+            type: DataTypes.DOUBLE,
+            field: 'valor_seguro'
         },
         valorFlete: {
-            type: DataTypes.DECIMAL(10, 2),
-            field: 'valor_flete',
+            type: DataTypes.DOUBLE,
+            field: 'valor_flete'
         },
         otrosCobros: {
-            type: DataTypes.DECIMAL(10, 2),
-            field: 'otros_cobros',
+            type: DataTypes.DOUBLE,
+            field: 'otros_cobros'
         },
         recargos: {
-            type: DataTypes.DECIMAL(10, 2),
+            type: DataTypes.DOUBLE
         },
-        descuentos: DataTypes.DECIMAL(10, 2),
+        descuentos: {
+            type: DataTypes.DOUBLE
+        },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE
     })

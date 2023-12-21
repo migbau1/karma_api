@@ -1,4 +1,4 @@
-import { FindOptions, InferAttributes, ModelCtor } from 'sequelize';
+import { FindOptions, Includeable, InferAttributes, ModelCtor } from 'sequelize';
 import sequelize from '../database/connection'
 import { IEncomiendaModel } from '../database/models/Encomienda';
 import { Request, Response } from 'express';
@@ -113,35 +113,82 @@ const createOne = async (req: Request, res: Response) => {
   }
 }
 
+const updateOne = async (req: Request, res: Response) => {
+  const transaction = await sequelize.transaction()
+  const body = req.body as IEncomiendaUpdateDto
+  try {
+    const tmpEncomienda = await encomiendaModel.findByPk(body.id, { include: [...defaultIncludes()], transaction })
+
+    if (tmpEncomienda) {
+      const { remitente, destinatario, origen, destino, producto, facturacion } = tmpEncomienda
+      tmpEncomienda.descripcion = body.descripcion
+
+      if (remitente)
+        remitente.nombre = body.remitente.nombre,
+          remitente.apellido = body.remitente.apellido,
+          remitente.cedula = body.remitente.cedula,
+          remitente.telefono = body.remitente.cedula,
+          await remitente.save({ transaction })
+
+      if (destinatario)
+        destinatario.nombre = body.destinatario.nombre,
+          destinatario.apellido = body.destinatario.apellido,
+          destinatario.cedula = body.destinatario.cedula,
+          destinatario.telefono = body.destinatario.cedula,
+          await destinatario.save({ transaction })
+
+      if (origen)
+        origen.departamento = body.origen.departamento,
+          origen.municipio = body.origen.municipio,
+          origen.direccion = body.origen.direccion,
+          origen.codigoPostal = body.origen.cod_postal
+
+      if (destino)
+        destino.departamento = body.destino.departamento,
+          destino.municipio = body.destino.municipio,
+          destino.direccion = body.destino.direccion,
+          destino.codigoPostal = body.destino.cod_postal
+
+      if (producto)
+        producto.nombre = body.producto.nombre,
+          producto.descripcion = body.producto.descripcion,
+          producto.tipoProducto = body.producto.tipo_producto,
+          producto.peso = body.producto.peso,
+          producto.cantidad = body.producto.cantidad,
+          producto.pesoCob = body.producto.peso_cobrar,
+          producto.pesoVol = body.producto.peso_vol,
+          producto.valorDeclarado = body.producto.valor_declarado,
+          await producto.save({ transaction })
+
+      if (facturacion)
+        facturacion.valorSeguro = body.facturacion.valorSeguro,
+          facturacion.valorFlete = body.facturacion.valorFlete,
+          facturacion.otrosCobros = body.facturacion.otrosCobros,
+          facturacion.recargos = body.facturacion.recargos,
+          facturacion.descuentos = body.facturacion.descuentos,
+          await facturacion.save({ transaction })
+
+
+      await tmpEncomienda.save({ transaction })
+    }
+
+    await transaction.commit()
+
+    res.send(tmpEncomienda)
+  } catch (error) {
+    await transaction.rollback()
+    console.log(error);
+
+    res.send(error)
+  }
+}
+
 const findAll = async (req: Request, res: Response) => {
   const transaction = await sequelize.transaction()
   const options: FindOptions<InferAttributes<IEncomiendaModel, { omit: never; }>> = {
     attributes: ['id', 'descripcion'],
     include: [
-      {
-        model: usuarioModel,
-        as: 'remitente',
-      },
-      {
-        model: usuarioModel,
-        as: 'destinatario',
-      },
-      {
-        model: ubicacionModel,
-        as: 'origen',
-      },
-      {
-        model: ubicacionModel,
-        as: 'destino',
-      },
-      {
-        model: productoModel,
-        as: 'producto'
-      },
-      {
-        model: facturacionModel,
-        as: 'facturacion'
-      }
+      ...defaultIncludes()
     ],
   }
   try {
@@ -158,7 +205,67 @@ const findAll = async (req: Request, res: Response) => {
   }
 }
 
+const findOne = async (req: Request, res: Response) => {
+  const transaction = await sequelize.transaction()
+  const options: FindOptions<InferAttributes<IEncomiendaModel, { omit: never; }>> = {
+    attributes: ['id', 'descripcion'],
+    include: [
+      ...defaultIncludes(),
+    ],
+  }
+  const param = req.params.id
+  try {
+
+    const tmpEnconmiendas = await encomiendaModel.findByPk(param, options)
+
+    if (!tmpEnconmiendas) {
+      return res.status(404).json({
+        message: 'Not Found'
+      })
+    }
+
+    await transaction.commit()
+    res.send(tmpEnconmiendas)
+  } catch (error) {
+    console.log(error);
+    await transaction.rollback()
+    res.send(error)
+  }
+}
+
+const defaultIncludes = (): Includeable[] => {
+  return [
+    {
+      model: usuarioModel,
+      as: 'remitente',
+    },
+    {
+      model: usuarioModel,
+      as: 'destinatario',
+    },
+    {
+      model: ubicacionModel,
+      as: 'origen',
+    },
+    {
+      model: ubicacionModel,
+      as: 'destino',
+    },
+    {
+      model: productoModel,
+      as: 'producto'
+    },
+    {
+      model: facturacionModel,
+      as: 'facturacion'
+    }
+  ]
+}
+
 export {
   createOne,
-  findAll
+  updateOne,
+  findAll,
+  findOne,
+  defaultIncludes
 };

@@ -32,8 +32,8 @@ const registerUser = async (req: Request, res: Response) => {
         res.send('Register successful')
     } catch (error) {
         await transaction.rollback()
+        console.log(error);
         res.send(error)
-        throw error
     }
 }
 

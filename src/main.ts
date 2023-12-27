@@ -8,6 +8,7 @@ import sequelize from './database/connection'
 import cors from 'cors'
 import passport from 'passport'
 import session from 'express-session'
+import cookieParser from 'cookie-parser'
 
 // Routes ****************************************************************
 import userRoute from './router/user.router'
@@ -16,7 +17,6 @@ import sedeRoute from './router/sede.router'
 import loginRoute from './router/access-control/login.route'
 import registerRoute from './router/access-control/register.router'
 import documentRoute from './router/generatedocument'
-import { IUserModel } from './database/models/Usuarios';
 
 const app: Express = express();
 
@@ -45,6 +45,7 @@ app.use(
     saveUninitialized: false,
   })
 );
+app.use(cookieParser())
 
 app.use(passport.initialize());
 app.use(passport.session());

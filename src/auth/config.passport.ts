@@ -1,5 +1,5 @@
 import { PassportStatic } from 'passport';
-import { Strategy, ExtractJwt } from 'passport-jwt'
+import { Strategy, ExtractJwt, JwtFromRequestFunction } from 'passport-jwt'
 import { Strategy as LocalStrategy } from 'passport-local'
 import sequelize from '../database/connection'
 import { ModelCtor, Sequelize } from 'sequelize';
@@ -14,11 +14,21 @@ const credenciales = sequelize.model('credenciales') as ModelCtor<ICredencialesM
 const usuarios = sequelize.model('usuarios') as ModelCtor<IUserModel>
 const usuarioSedeModel = sequelize.model('usuario_sedes') as ModelCtor<ISedeModel>
 
+const cookieExtractor: JwtFromRequestFunction = req => {
+  let jwt = null
+
+  if (req && req.cookies) {
+    jwt = req.cookies['jwt']
+  }
+  
+  return jwt
+}
+
 function configPassport(passport: PassportStatic) {
   passport.use(
     new Strategy(
       {
-        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        jwtFromRequest: cookieExtractor,
         secretOrKey: "secret",
       },
       async (payload, done) => {

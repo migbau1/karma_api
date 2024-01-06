@@ -1,14 +1,22 @@
-import { FindOptions, InferAttributes, ModelCtor, Op } from 'sequelize'
+import { FindOptions, Includeable, InferAttributes, ModelCtor, Op } from 'sequelize'
 import sequelize from '../database/connection'
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import { IUserModel } from '../database/models/Usuarios';
 import { IUbicationModel } from '../database/models/Ubicacion';
 import Roles from '../utils/roles/roles.pointer';
 import IUpdateUserDto from '../dto/user/update.dto';
 import IUserCreateDto from '../dto/user/create.dto';
+import ICustomerParams from '../dto/user/query.params';
 
 const usuarios = sequelize.model('usuarios') as ModelCtor<IUserModel>
 const ubicaciones = sequelize.model('ubicacion') as ModelCtor<IUbicationModel>
+
+const mapModels = [
+  {
+    name: 'ubicacion',
+    model: ubicaciones
+  }
+]
 
 async function createOne(req: Request, res: Response) {
   const { nombre, apellido, cedula, telefono, rol, ubicacion } = req.body as IUserCreateDto;
@@ -102,19 +110,38 @@ const updateOne = async (req: Request, res: Response) => {
   }
 }
 
-const findAll = async (req: Request, res: Response) => {
+const findAll = async (
+  req: Request,
+  res: Response
+) => {
   const t = await sequelize.transaction()
+  const { includes, widthAdmins = false, limit = 5, offset = 0 } = req.query
   let options: FindOptions<InferAttributes<IUserModel, { omit: never; }>> | undefined = {}
-
-  options.where = {
-    roleId: {
-      [Op.notIn]: [Roles.admin]
-    }
-  }
+  options.subQuery = false
 
   try {
+    options.transaction = t
 
-    const tmpUsuarios = await usuarios.findAll(options)
+    if (limit && offset) {
+      options.limit = parseInt(limit as string)
+      options.offset = parseInt(offset as string)
+    }
+
+    options.where = {
+      roleId: {
+        [Op.notIn]: [!widthAdmins && Roles.admin]
+      },
+    }
+
+    if (includes) {
+      options.include = addIncludes(includes as string[])
+    }
+
+    const tmpUsuarios = await usuarios.findAndCountAll({
+      ...options
+    })
+
+    await t.commit()
 
     res.send(tmpUsuarios)
   } catch (error) {
@@ -137,6 +164,21 @@ const findOne = async (req: Request, res: Response) => {
     await t.rollback();
     res.send(error);
   }
+}
+
+const addIncludes = (includes: Array<string>): Includeable[] => {
+
+  const models = includes.map((nameModel) => (
+    mapModels.find(({ name }) => name === nameModel)?.model
+  ))
+
+  const tmpIncludes: Includeable[] = models.map((model) => (
+    {
+      model,
+    }
+  ))
+
+  return tmpIncludes
 }
 
 

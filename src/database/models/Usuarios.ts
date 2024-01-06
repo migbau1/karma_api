@@ -1,6 +1,7 @@
 import { CreationOptional, InferAttributes, InferCreationAttributes, Model, Sequelize, UUIDV4, UUID, DataTypes } from "sequelize"
 import { IUbicationModel } from "./Ubicacion"
 import { IUsuarioSedesModel } from "./UsuarioSedes"
+import { IRolesModel } from "./Roles"
 
 interface IUserModel extends Model<InferAttributes<IUserModel>, InferCreationAttributes<IUserModel>> {
     id?: CreationOptional<string>
@@ -15,6 +16,7 @@ interface IUserModel extends Model<InferAttributes<IUserModel>, InferCreationAtt
     updatedAt?: Date
     ubicacion?: IUbicationModel
     usuarioSede?: IUsuarioSedesModel
+    role?: IRolesModel
 }
 
 const userModelDefiner = (sequelize: Sequelize) => {

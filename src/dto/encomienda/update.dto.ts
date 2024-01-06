@@ -1,7 +1,7 @@
 import IEncomiendaCreateDto from "./create.dto";
 
 interface IEncomiendaUpdateDto extends IEncomiendaCreateDto {
-    id: string;
+    id: number;
 }
 
 export default IEncomiendaUpdateDto

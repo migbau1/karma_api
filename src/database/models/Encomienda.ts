@@ -1,4 +1,4 @@
-import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize, UUID, UUIDV4 } from "sequelize";
+import { CreationOptional, DataTypes, INTEGER, InferAttributes, InferCreationAttributes, Model, Sequelize, UUID, UUIDV4 } from "sequelize";
 import { IUbicationModel } from "./Ubicacion";
 import { IUserModel } from "./Usuarios";
 import { IProductoModel } from "./Producto";
@@ -7,7 +7,7 @@ import { IFacturacionModel } from "./Facturacion";
 import { ISedeModel } from "./Sede";
 
 interface IEncomiendaModel extends Model<InferAttributes<IEncomiendaModel>, InferCreationAttributes<IEncomiendaModel>> {
-  id: CreationOptional<string>
+  id: CreationOptional<number>
   remitente_id: string
   destinatario_id: string
   origen_id: string
@@ -32,10 +32,10 @@ interface IEncomiendaModel extends Model<InferAttributes<IEncomiendaModel>, Infe
 const encomiendaModelDefiner = (sequelize: Sequelize) => {
   sequelize.define<IEncomiendaModel>("encomiendas", {
     id: {
-      type: UUID,
+      type: INTEGER,
       primaryKey: true,
       allowNull: false,
-      defaultValue: UUIDV4,
+      autoIncrement: true,
     },
     remitente_id: {
       type: DataTypes.UUID,

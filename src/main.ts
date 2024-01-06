@@ -5,7 +5,7 @@ dotenv.config();
 import express, { Express } from 'express'
 
 import sequelize from './database/connection'
-import cors from 'cors'
+import cors, { CorsOptions } from 'cors'
 import passport from 'passport'
 import session from 'express-session'
 import cookieParser from 'cookie-parser'
@@ -20,7 +20,7 @@ import documentRoute from './router/generatedocument'
 
 const app: Express = express();
 
-const corsOptions = {
+const corsOptions: CorsOptions = {
   origin: [
     "http://localhost:8081",
     "http://localhost:3000",
@@ -31,8 +31,11 @@ const corsOptions = {
     "https://www.anditransas.com",
     "http://localhost:8081/*",
     "http://localhost:8081/login",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8081"
   ],
-  optionsSuccessStatus: 200,
+  methods: ["GET", "POST", "PUT"],
+  credentials: true
 };
 
 app.use(cors(corsOptions));

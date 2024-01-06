@@ -8,7 +8,7 @@
     "start": "node dist/main.js",
     "start:dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/main.js\"",
     "migration:generate": "sequelize-cli migration:generate --name ",
-    "migration:run": "sequelize-cli db:migrate",
+    "migration:run": "sequelize-cli db:migrate && npm run seed:run",
     "migration:revert": "sequelize-cli db:migrate:undo",
     "seed:generate": "sequelize-cli seed:generate --name ",
     "seed:run": "sequelize-cli db:seed:all",

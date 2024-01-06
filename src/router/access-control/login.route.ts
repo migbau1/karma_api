@@ -7,6 +7,6 @@ const Router = router();
 
 Router.post("/", loginPost);
 
-Router.post("/validate", passport.authenticate('jwt'), checkUserRole([Roles.admin]), validateToken);
+Router.get("/validate", passport.authenticate('jwt'), checkUserRole([Roles.admin]), validateToken);
 
 export default Router;

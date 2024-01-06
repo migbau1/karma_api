@@ -18,6 +18,29 @@ const productoModel = sequelize.model('productos') as ModelCtor<IProductoModel>
 const registroModel = sequelize.model('registro_encomiendas') as ModelCtor<IRegistroModel>
 const facturacionModel = sequelize.model('facturacion') as ModelCtor<IFacturacionModel>
 
+const mapModels = [
+  {
+    name: 'usuarios',
+    model: usuarioModel
+  },
+  {
+    name: 'ubicacion',
+    model: ubicacionModel
+  },
+  {
+    name: 'productos',
+    model: productoModel
+  },
+  {
+    name: 'registro_encomiendas',
+    model: registroModel
+  },
+  {
+    name: 'facturacion',
+    model: facturacionModel
+  },
+]
+
 const createOne = async (req: Request, res: Response) => {
   const transaction = await sequelize.transaction()
   try {
@@ -184,16 +207,27 @@ const updateOne = async (req: Request, res: Response) => {
 }
 
 const findAll = async (req: Request, res: Response) => {
+  const { includes, limit = 5, offset = 0 } = req.query
   const transaction = await sequelize.transaction()
-  const options: FindOptions<InferAttributes<IEncomiendaModel, { omit: never; }>> = {
-    attributes: ['id', 'descripcion'],
+  let options: FindOptions<InferAttributes<IEncomiendaModel, { omit: never; }>> = {
+    attributes: ['id', 'descripcion', 'createdAt'],
     include: [
       ...defaultIncludes()
     ],
   }
+
   try {
 
-    const tmpEnconmiendas = await encomiendaModel.findAll(options)
+    if (limit && offset) {
+      options.limit = parseInt(limit as string)
+      options.offset = parseInt(offset as string)
+    }
+
+    if (includes) {
+      options.include = [...defaultIncludes(), ...addIncludes(includes as string[])]
+    }
+
+    const tmpEnconmiendas = await encomiendaModel.findAndCountAll(options)
 
     await transaction.commit()
     res.send(tmpEnconmiendas)
@@ -260,6 +294,21 @@ const defaultIncludes = (): Includeable[] => {
       as: 'facturacion'
     }
   ]
+}
+
+const addIncludes = (includes: Array<string>): Includeable[] => {
+
+  const models = includes.map((nameModel) => (
+    mapModels.find(({ name }) => name === nameModel)?.model
+  ))
+
+  const tmpIncludes: Includeable[] = models.map((model) => (
+    {
+      model,
+    }
+  ))
+
+  return tmpIncludes
 }
 
 export {

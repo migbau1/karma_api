@@ -154,9 +154,9 @@ module.exports = {
 
       await queryInterface.createTable('encomiendas', {
         id: {
-          type: Sequelize.UUID,
+          type: Sequelize.INTEGER,
           primaryKey: true,
-          defaultValue: Sequelize.UUIDV4
+          autoIncrement: true,
         },
         remitente: {
           type: Sequelize.UUID,
@@ -236,7 +236,7 @@ module.exports = {
           defaultValue: Sequelize.UUIDV4
         },
         encomienda: {
-          type: Sequelize.UUID,
+          type: Sequelize.INTEGER,
           references: {
             model: {
               tableName: 'encomiendas'

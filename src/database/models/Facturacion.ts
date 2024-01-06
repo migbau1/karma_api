@@ -1,10 +1,10 @@
-import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize, UUID, UUIDV4 } from "sequelize";
+import { CreationOptional, DataTypes, INTEGER, InferAttributes, InferCreationAttributes, Model, Sequelize, UUID, UUIDV4 } from "sequelize";
 import { IEncomiendaModel } from "./Encomienda";
 
 
 interface IFacturacionModel extends Model<InferAttributes<IFacturacionModel>, InferCreationAttributes<IFacturacionModel>> {
     id: CreationOptional<string>
-    encomiendaId: string
+    encomiendaId: number
     valorSeguro: number
     valorFlete: number
     otrosCobros: number
@@ -23,7 +23,7 @@ const facturacionModelDefiner = (sequelize: Sequelize) => {
             defaultValue: UUIDV4
         },
         encomiendaId: {
-            type: UUID,
+            type: INTEGER,
             references: {
                 model: 'encomiendas',
                 key: 'id'

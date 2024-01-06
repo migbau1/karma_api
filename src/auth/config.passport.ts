@@ -7,20 +7,22 @@ import { ICredencialesModel } from '../database/models/Credenciales';
 import { isMatch } from '../utils/hash/password.hash';
 import { IUserModel } from '../database/models/Usuarios';
 import { ISedeModel } from '../database/models/Sede';
+import { IRolesModel } from '../database/models/Roles';
 
 const { models } = sequelize
 
 const credenciales = sequelize.model('credenciales') as ModelCtor<ICredencialesModel>
 const usuarios = sequelize.model('usuarios') as ModelCtor<IUserModel>
 const usuarioSedeModel = sequelize.model('usuario_sedes') as ModelCtor<ISedeModel>
+const roleModel = sequelize.model('roles') as ModelCtor<IRolesModel>
 
 const cookieExtractor: JwtFromRequestFunction = req => {
   let jwt = null
 
   if (req && req.cookies) {
-    jwt = req.cookies['jwt']
+    jwt = req.cookies['JWT_TOKEN']
   }
-  
+
   return jwt
 }
 
@@ -39,6 +41,7 @@ function configPassport(passport: PassportStatic) {
               "id",
               "nombre", "apellido",
               [Sequelize.col('rol_id'), 'roleId'],
+              [Sequelize.col('role.name'), 'rolName'],
               [Sequelize.col('credenciale.email'), 'email'],
               [Sequelize.col('usuario_sede.sede_id'), 'sedeId']
             ],
@@ -49,6 +52,9 @@ function configPassport(passport: PassportStatic) {
               },
               {
                 model: usuarioSedeModel
+              },
+              {
+                model: roleModel
               }
             ],
             raw: true
@@ -58,12 +64,16 @@ function configPassport(passport: PassportStatic) {
             return done(null, false, { msg: "no hay" });
           }
 
+          console.log(user);
+
           return done(null, {
             id: user.id,
             nombre: user.nombre,
             apellido: user.apellido,
-            rol_id: user.roleId!,
-            sedeId: user.sedeId
+            rol_name: user.rolName!,
+            rol_id: user.roleId,
+            sedeId: user.sedeId,
+            email: user.email
           });
         } catch (error) {
           console.log(error);
@@ -90,6 +100,9 @@ function configPassport(passport: PassportStatic) {
                 },
                 include: [{
                   model: usuarioSedeModel
+                },
+                {
+                  model: roleModel
                 }]
               }
             ],
@@ -111,14 +124,16 @@ function configPassport(passport: PassportStatic) {
           }
 
           const tempUser = credentials.get().usuario?.get()
-
+          
           await transaction.commit()
 
           return done(null, {
             id: tempUser?.id,
             nombre: tempUser?.nombre!,
             apellido: tempUser?.apellido!,
+            rol_name: tempUser?.role?.name!,
             rol_id: tempUser?.roleId!,
+            email: credentials.email,
             sedeId: tempUser?.usuarioSede?.usuarioId!
           });
         } catch (error) {

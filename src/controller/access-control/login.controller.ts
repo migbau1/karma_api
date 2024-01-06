@@ -24,7 +24,9 @@ function loginPost(req: Request, res: Response, next: NextFunction) {
         });
 
         return res.status(200).json({
-          msg: `Bienvenido de vuelta ${user.nombre}.`,
+          nombre: `${user.nombre} ${user.apellido}`,
+          email: user.email,
+          rol: user.rol_name,
           token: hash,
         });
       });

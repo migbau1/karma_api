@@ -20,29 +20,26 @@ import documentRoute from './router/generatedocument'
 
 const app: Express = express();
 
+const whitelist = ["https://karma-app-roan.vercel.app", "http://localhost:3000"];
+
 const corsOptions: CorsOptions = {
-  origin: [
-    "http://localhost:8081",
-    "http://localhost:3000",
-    "http://anditransas.com",
-    "http://217.21.78.153",
-    "https://anditransas.com",
-    "http://www.anditransas.com",
-    "https://www.anditransas.com",
-    "http://localhost:8081/*",
-    "http://localhost:8081/login",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:8081"
-  ],
-  methods: ["GET", "POST", "PUT"],
-  credentials: true
+  allowedHeaders: ["Origin, X-Requested-With, Content-Type, Accept", "Access-Control-Allow-Credentials"],
+  credentials: true,
+  origin(requestOrigin, callback) {
+    if (whitelist.includes(requestOrigin!)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "OPTIONS"],
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(
   session({
-    cookie: { maxAge: 60000 },
+    cookie: { secure: false, maxAge: 60000 },
     secret: "secret",
     resave: false,
     saveUninitialized: false,

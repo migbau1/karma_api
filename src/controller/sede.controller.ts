@@ -38,7 +38,7 @@ async function createOne(req: Request, res: Response) {
       departamento: ubicacion.departamento,
       municipio: ubicacion.municipio,
       direccion: ubicacion.direccion,
-      codigoPostal: ubicacion.cod_postal
+      codigoPostal: ubicacion.codigoPostal
     }, { transaction })
 
     const tmpSede = await sedesModel.create({
@@ -77,7 +77,7 @@ const updateOne = async (req: Request, res: Response) => {
         tmpSede.ubicacion.departamento = ubicacion.departamento
         tmpSede.ubicacion.municipio = ubicacion.municipio
         tmpSede.ubicacion.direccion = ubicacion.direccion
-        tmpSede.ubicacion.codigoPostal = ubicacion.cod_postal
+        tmpSede.ubicacion.codigoPostal = ubicacion.codigoPostal
       }
 
       await tmpSede.save({ transaction })

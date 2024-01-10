@@ -29,7 +29,7 @@ async function createOne(req: Request, res: Response) {
         departamento: ubicacion.departamento,
         municipio: ubicacion.municipio,
         direccion: ubicacion.direccion,
-        codigoPostal: ubicacion.cod_postal
+        codigoPostal: ubicacion.codigoPostal
       }, {
         transaction: t,
       });
@@ -81,14 +81,14 @@ const updateOne = async (req: Request, res: Response) => {
         tmpUser.ubicacion.departamento = ubicacion?.departamento
         tmpUser.ubicacion.municipio = ubicacion?.municipio
         tmpUser.ubicacion.direccion = ubicacion?.direccion
-        tmpUser.ubicacion.codigoPostal = ubicacion?.cod_postal
+        tmpUser.ubicacion.codigoPostal = ubicacion?.codigoPostal
         await tmpUser.ubicacion.save()
       } else if (ubicacion) {
         const tmpUbicacion = await ubicaciones.create({
           departamento: ubicacion.departamento,
           municipio: ubicacion.municipio,
           direccion: ubicacion.direccion,
-          codigoPostal: ubicacion.cod_postal
+          codigoPostal: ubicacion.codigoPostal
         }, { transaction: t })
 
         tmpUser.ubicacion = tmpUbicacion

@@ -2,7 +2,7 @@ interface IUbicacionDto {
     id?: string;
     departamento: string;
     municipio: string;
-    cod_postal: string;
+    codigoPostal: string;
     direccion: string;
 }
 

@@ -82,14 +82,14 @@ const createOne = async (req: Request, res: Response) => {
       departamento: origen.departamento,
       municipio: origen.municipio,
       direccion: origen.direccion,
-      codigoPostal: origen.cod_postal
+      codigoPostal: origen.codigoPostal
     }, { transaction })
 
     const tmpDestino = await ubicacionModel.create({
       departamento: destino.departamento,
       municipio: destino.municipio,
       direccion: destino.direccion,
-      codigoPostal: destino.cod_postal
+      codigoPostal: destino.codigoPostal
     }, { transaction })
 
     const tmpProducto = await productoModel.create({
@@ -164,13 +164,15 @@ const updateOne = async (req: Request, res: Response) => {
         origen.departamento = body.origen.departamento,
           origen.municipio = body.origen.municipio,
           origen.direccion = body.origen.direccion,
-          origen.codigoPostal = body.origen.cod_postal
+          origen.codigoPostal = body.origen.codigoPostal,
+          await origen.save({ transaction })
 
       if (destino)
         destino.departamento = body.destino.departamento,
           destino.municipio = body.destino.municipio,
           destino.direccion = body.destino.direccion,
-          destino.codigoPostal = body.destino.cod_postal
+          destino.codigoPostal = body.destino.codigoPostal,
+          await destino.save({ transaction })
 
       if (producto)
         producto.nombre = body.producto.nombre,
@@ -202,7 +204,7 @@ const updateOne = async (req: Request, res: Response) => {
     await transaction.rollback()
     console.log(error);
 
-    res.send(error)
+    res.status(500).send(error)
   }
 }
 
@@ -249,7 +251,7 @@ const findOne = async (req: Request, res: Response) => {
   }
   const param = req.params.id
   try {
-
+    options.transaction = transaction
     const tmpEnconmiendas = await encomiendaModel.findByPk(param, options)
 
     if (!tmpEnconmiendas) {

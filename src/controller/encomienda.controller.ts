@@ -219,7 +219,7 @@ const findAll = async (req: Request, res: Response) => {
   }
 
   try {
-
+    options.transaction = transaction
     if (limit && offset) {
       options.limit = parseInt(limit as string)
       options.offset = parseInt(offset as string)
@@ -234,8 +234,6 @@ const findAll = async (req: Request, res: Response) => {
     await transaction.commit()
     res.send(tmpEnconmiendas)
   } catch (error) {
-
-    console.log(error);
     await transaction.rollback()
     res.send(error)
   }

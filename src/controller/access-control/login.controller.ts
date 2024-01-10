@@ -23,7 +23,7 @@ function loginPost(req: Request, res: Response, next: NextFunction) {
           expiresIn: "24h",
         });
 
-        res.cookie("JWT_TOKEN", hash)
+        res.cookie("JWT_TOKEN", hash, { httpOnly: true, sameSite: 'none', secure: true })
 
         return res.status(200).json({
           nombre: `${user.nombre} ${user.apellido}`,

@@ -42,7 +42,7 @@ app.use(
     cookie: { secure: false, maxAge: 60000 },
     secret: "secret",
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: false
   })
 );
 app.use(cookieParser())

@@ -68,7 +68,9 @@ async function exportEncomienda(req: Request, res: Response) {
             producto,
             registro,
             facturacion,
-            descripcion, sede, id } = tmpEncomienda
+            descripcion,
+            sede,
+            id } = tmpEncomienda
 
 
         /**
@@ -77,7 +79,7 @@ async function exportEncomienda(req: Request, res: Response) {
         ws.getRow(2).getCell(8).value = "ENVIOS ANAYA"
         ws.getRow(3).getCell(8).value = "NIT. 901.661.421-1"
         ws.getRow(4).getCell(8).value = "DIR. CLL 33 # 19-64 CENTRO B/MANGA"
-        ws.getRow(5).getCell(8).value = "TEL: 3103048782"
+        ws.getRow(5).getCell(8).value = "TEL: 3103048782 - 3144099530"
         //codigoDebarras
         ws.getRow(3).getCell(12).value = code;
         //consecutivo
@@ -86,7 +88,7 @@ async function exportEncomienda(req: Request, res: Response) {
         ws.getRow(28).getCell(8).value = "ENVIOS ANAYA"
         ws.getRow(29).getCell(8).value = "NIT. 901.661.421-1"
         ws.getRow(30).getCell(8).value = "DIR. CLL 33 # 19-64 CENTRO B/MANGA"
-        ws.getRow(31).getCell(8).value = "TEL: 3103048782"
+        ws.getRow(31).getCell(8).value = "TEL: 3103048782 - 3144099530"
         //codigoDebarras
         ws.getRow(29).getCell(12).value = code;
         //consecutivo
@@ -95,7 +97,7 @@ async function exportEncomienda(req: Request, res: Response) {
         ws.getRow(54).getCell(8).value = "ENVIOS ANAYA"
         ws.getRow(55).getCell(8).value = "NIT. 901.661.421-1"
         ws.getRow(56).getCell(8).value = "DIR. CLL 33 # 19-64 CENTRO B/MANGA"
-        ws.getRow(57).getCell(8).value = "TEL: 3103048782"
+        ws.getRow(57).getCell(8).value = "TEL: 3103048782 - 3144099530"
         //codigoDebarras
         ws.getRow(55).getCell(12).value = code;
         //consecutivo
@@ -286,7 +288,7 @@ async function exportEncomienda(req: Request, res: Response) {
             //Valor a cobrar
             ws.getRow(16).getCell(24).value = total;
             //Forma de pago
-            ws.getRow(7).getCell(11).value = 'forma pago';
+            ws.getRow(7).getCell(11).value = facturacion.modoDePago;
 
             ws.getRow(19).getCell(2).value = descripcion;
             //==============================================================
@@ -304,7 +306,7 @@ async function exportEncomienda(req: Request, res: Response) {
             //Valor a cobrar
             ws.getRow(42).getCell(24).value = total;
             //Forma de pago
-            ws.getRow(33).getCell(11).value = 'forma pago';
+            ws.getRow(33).getCell(11).value = facturacion.modoDePago;
             //fecha admision
             ws.getRow(32).getCell(24).value = fecha.date;
             //Hora Admision
@@ -314,6 +316,8 @@ async function exportEncomienda(req: Request, res: Response) {
             //Observaciones generales
             ws.getRow(45).getCell(2).value = descripcion;
 
+            //Forma de pago
+            ws.getRow(59).getCell(11).value = facturacion.modoDePago;
             //Valor seguro
             ws.getRow(64).getCell(24).value = facturacion.valorSeguro;
             //Otros cobros
@@ -342,7 +346,7 @@ async function exportEncomienda(req: Request, res: Response) {
         ws.getRow(33).getCell(8).value = "Domicilio";
         ws.getRow(59).getCell(8).value = "Domicilio";
 
-        const msg = `El usuario manifiesta que conoce los terminos y condiciones del contrato que encontro publicado en el punto de venta y/o suministro el operador para la lectura, cuyo contenido acepta con la suscripcion de este documento. Para efecto de PQR el usuario podra manifestarlas a traves de las lineas telefonicas de atencion al cliente Tel. 3103048782 o a los correos electronicos enviosanayasas@gmail.com`
+        const msg = `El usuario manifiesta que conoce los terminos y condiciones del contrato que encontro publicado en el punto de venta y/o suministro el operador para la lectura, cuyo contenido acepta con la suscripcion de este documento. Para efecto de PQR el usuario podra manifestarlas a traves de las lineas telefonicas de atencion al cliente Tel. 3103048782 - 3144099530 o a los correos electronicos enviosanayasas@gmail.com`
 
         ws.getRow(21).getCell(5).value = msg;
         ws.getRow(47).getCell(5).value = msg;

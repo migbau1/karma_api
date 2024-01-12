@@ -5,6 +5,7 @@ interface IFacturacionCreateDto {
     otrosCobros: number
     recargos: number
     descuentos: number
+    modoDePago: string
 }
 
 export default IFacturacionCreateDto

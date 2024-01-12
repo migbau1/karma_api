@@ -1,4 +1,4 @@
-import { FindOptions, Includeable, InferAttributes, ModelCtor } from 'sequelize';
+import { FindOptions, Includeable, InferAttributes, ModelCtor, Op, WhereOptions } from 'sequelize';
 import sequelize from '../database/connection'
 import { IEncomiendaModel } from '../database/models/Encomienda';
 import { Request, Response } from 'express';
@@ -125,6 +125,7 @@ const createOne = async (req: Request, res: Response) => {
       otrosCobros: facturacion.otrosCobros,
       recargos: facturacion.recargos,
       descuentos: facturacion.descuentos,
+      modoDePago: facturacion.modoDePago
     }, { transaction })
 
     await transaction.commit()
@@ -149,14 +150,14 @@ const updateOne = async (req: Request, res: Response) => {
         remitente.nombre = body.remitente.nombre,
           remitente.apellido = body.remitente.apellido,
           remitente.cedula = body.remitente.cedula,
-          remitente.telefono = body.remitente.cedula,
+          remitente.telefono = body.remitente.telefono,
           await remitente.save({ transaction })
 
       if (destinatario)
         destinatario.nombre = body.destinatario.nombre,
           destinatario.apellido = body.destinatario.apellido,
           destinatario.cedula = body.destinatario.cedula,
-          destinatario.telefono = body.destinatario.cedula,
+          destinatario.telefono = body.destinatario.telefono,
           await destinatario.save({ transaction })
 
       if (origen)
@@ -190,6 +191,7 @@ const updateOne = async (req: Request, res: Response) => {
           facturacion.otrosCobros = body.facturacion.otrosCobros,
           facturacion.recargos = body.facturacion.recargos,
           facturacion.descuentos = body.facturacion.descuentos,
+          facturacion.modoDePago = body.facturacion.modoDePago,
           await facturacion.save({ transaction })
 
 
@@ -208,7 +210,16 @@ const updateOne = async (req: Request, res: Response) => {
 }
 
 const findAll = async (req: Request, res: Response) => {
-  const { includes, limit = 5, offset = 0 } = req.query
+  const {
+    includes,
+    limit = 5,
+    offset = 0,
+    origenDepartamento,
+    origenMunicipio,
+    destinoDepartamento,
+    destinoMunicipio,
+    search
+  } = req.query
   const transaction = await sequelize.transaction()
   let options: FindOptions<InferAttributes<IEncomiendaModel, { omit: never; }>> = {
     attributes: ['id', 'descripcion', 'createdAt'],
@@ -216,9 +227,11 @@ const findAll = async (req: Request, res: Response) => {
       ...defaultIncludes()
     ],
   }
+  let tmpWhere: WhereOptions<InferAttributes<IEncomiendaModel, { omit: never; }>> = {}
 
   try {
     options.transaction = transaction
+
     if (limit && offset) {
       options.limit = parseInt(limit as string)
       options.offset = parseInt(offset as string)
@@ -228,11 +241,76 @@ const findAll = async (req: Request, res: Response) => {
       options.include = [...defaultIncludes(), ...addIncludes(includes as string[])]
     }
 
+    if (origenDepartamento) {
+      tmpWhere["$origen.departamento$"] = origenDepartamento
+    }
+
+    if (origenMunicipio) {
+      tmpWhere["$origen.municipio$"] = origenMunicipio
+    }
+
+    if (destinoDepartamento) {
+      tmpWhere["$destino.departamento$"] = destinoDepartamento
+    }
+
+    if (destinoMunicipio) {
+      tmpWhere["$destino.municipio$"] = destinoMunicipio
+    }
+
+    const findId = !!Number(search) && Number(search)
+
+
+    if (search) {
+
+      if (findId) {
+        tmpWhere.id = findId
+      } else {
+        tmpWhere = {
+          ...tmpWhere,
+          [Op.or]: [
+            {
+              ["$remitente.nombre$"]: {
+                [Op.like]: `%${search}%`
+              }
+            },
+            {
+              ["$remitente.apellido$"]: {
+                [Op.like]: `%${search}%`
+              }
+            },
+            {
+              ["$origen.departamento$"]: {
+                [Op.like]: `%${search}%`
+              }
+            },
+            {
+              ["$origen.municipio$"]: {
+                [Op.like]: `%${search}%`
+              }
+            },
+            {
+              ["$destino.departamento$"]: {
+                [Op.like]: `%${search}%`
+              }
+            },
+            {
+              ["$destino.municipio$"]: {
+                [Op.like]: `%${search}%`
+              }
+            },
+          ]
+        } as typeof tmpWhere
+      }
+    }
+
+    options.where = tmpWhere
     const tmpEnconmiendas = await encomiendaModel.findAndCountAll(options)
 
     await transaction.commit()
     res.send(tmpEnconmiendas)
   } catch (error) {
+    console.log(error);
+
     await transaction.rollback()
     res.send(error)
   }

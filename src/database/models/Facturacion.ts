@@ -10,6 +10,7 @@ interface IFacturacionModel extends Model<InferAttributes<IFacturacionModel>, In
     otrosCobros: number
     recargos: number
     descuentos: number
+    modoDePago: string
     createdAt?: Date
     updatedAt?: Date
     encomienda?: IEncomiendaModel
@@ -47,6 +48,11 @@ const facturacionModelDefiner = (sequelize: Sequelize) => {
         },
         descuentos: {
             type: DataTypes.DOUBLE
+        },
+        modoDePago: {
+            type: DataTypes.STRING,
+            defaultValue: "contado",
+            field: "pay_mode"
         },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE

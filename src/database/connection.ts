@@ -30,6 +30,9 @@ const sequelize: Sequelize = new Sequelize({
     dateStrings: true,
   },
   timezone: "-05:00",
+  logging: (ev, a) => {
+    console.log(ev);
+  },
 }
 );
 

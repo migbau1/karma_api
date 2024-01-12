@@ -64,8 +64,6 @@ function configPassport(passport: PassportStatic) {
             return done(null, false, { msg: "no hay" });
           }
 
-          console.log(user);
-
           return done(null, {
             id: user.id,
             nombre: user.nombre,

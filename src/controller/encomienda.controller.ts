@@ -98,9 +98,9 @@ const createOne = async (req: Request, res: Response) => {
       tipoProducto: producto.tipo_producto,
       cantidad: producto.cantidad,
       peso: producto.peso,
-      pesoCob: producto.peso_cobrar,
-      pesoVol: producto.peso_vol,
-      valorDeclarado: producto.valor_declarado
+      pesoCob: producto.pesoCob,
+      pesoVol: producto.pesoVol,
+      valorDeclarado: producto.valorDeclarado
     }, { transaction })
 
     const tmpRegistro = await registroModel.create({
@@ -129,10 +129,9 @@ const createOne = async (req: Request, res: Response) => {
 
     await transaction.commit()
     res.send(tmpFacturacion.get())
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
     await transaction.rollback()
-    res.send(error)
+    res.status(500).send(error.errors[0])
   }
 }
 
@@ -180,9 +179,9 @@ const updateOne = async (req: Request, res: Response) => {
           producto.tipoProducto = body.producto.tipo_producto,
           producto.peso = body.producto.peso,
           producto.cantidad = body.producto.cantidad,
-          producto.pesoCob = body.producto.peso_cobrar,
-          producto.pesoVol = body.producto.peso_vol,
-          producto.valorDeclarado = body.producto.valor_declarado,
+          producto.pesoCob = body.producto.pesoCob,
+          producto.pesoVol = body.producto.pesoVol,
+          producto.valorDeclarado = body.producto.valorDeclarado,
           await producto.save({ transaction })
 
       if (facturacion)

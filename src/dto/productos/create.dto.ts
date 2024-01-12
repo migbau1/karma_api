@@ -4,9 +4,9 @@ interface IProductoCreateDto {
     tipo_producto: string;
     cantidad: number
     peso: number
-    peso_cobrar: number
-    peso_vol: number
-    valor_declarado: number
+    pesoCob: number
+    pesoVol: number
+    valorDeclarado: number
 }
 
 export default IProductoCreateDto

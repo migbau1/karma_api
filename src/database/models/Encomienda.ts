@@ -78,7 +78,7 @@ const encomiendaModelDefiner = (sequelize: Sequelize) => {
       field: 'producto_id'
     },
     descripcion: {
-      allowNull: false,
+      allowNull: true,
       type: DataTypes.STRING(50),
     },
     registro_encomiendas: {

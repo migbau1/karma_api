@@ -1,4 +1,4 @@
-import { FindOptions, Includeable, InferAttributes, ModelCtor, Op } from 'sequelize'
+import { FindOptions, Includeable, InferAttributes, ModelCtor, Op, WhereOptions } from 'sequelize'
 import sequelize from '../database/connection'
 import { Request, RequestHandler, Response } from 'express';
 import { IUserModel } from '../database/models/Usuarios';
@@ -51,11 +51,7 @@ async function createOne(req: Request, res: Response) {
     tmpUser != undefined ? res.send(tmpUser) : res.send({});
   } catch (error: any) {
     await t.rollback();
-    res.send({
-      name: error.name,
-      type: error.parent.routine,
-      message: "ups, an error has occurred",
-    });
+    res.status(500).send(error.errors[0]);
   }
 }
 
@@ -115,8 +111,9 @@ const findAll = async (
   res: Response
 ) => {
   const t = await sequelize.transaction()
-  const { includes, widthAdmins = false, limit = 5, offset = 0 } = req.query
+  const { includes, widthAdmins = false, limit = 5, offset = 0, cedula } = req.query
   let options: FindOptions<InferAttributes<IUserModel, { omit: never; }>> | undefined = {}
+  let tmpWhere: WhereOptions<InferAttributes<IUserModel>> = {}
   options.subQuery = false
 
   try {
@@ -127,11 +124,19 @@ const findAll = async (
       options.offset = parseInt(offset as string)
     }
 
-    options.where = {
-      roleId: {
-        [Op.notIn]: [!widthAdmins && Roles.admin]
-      },
+    if (cedula) {
+      tmpWhere.cedula = {
+        [Op.eq]: String(cedula)
+      }
     }
+
+    if (widthAdmins) {
+      tmpWhere.roleId = {
+        [Op.in]: [Roles.admin]
+      }
+    }
+
+    options.where = tmpWhere
 
     if (includes) {
       options.include = addIncludes(includes as string[])
@@ -158,7 +163,32 @@ const findOne = async (req: Request, res: Response) => {
     }
   }
   try {
+    options.transaction = t
     const tmpUsuario = await usuarios.findByPk(req.params.id, options)
+    await t.commit()
+    res.send(tmpUsuario)
+  } catch (error) {
+    await t.rollback();
+    res.send(error);
+  }
+}
+
+const findByIdentification = async (req: Request, res: Response) => {
+  const t = await sequelize.transaction()
+  let options: FindOptions<InferAttributes<IUserModel, { omit: never; }>> | undefined = {
+    include: {
+      model: ubicaciones
+    }
+  }
+  try {
+    options.transaction = t
+    options.where = {
+      cedula: {
+        equals: req.params.cedula
+      }
+    }
+    const tmpUsuario = await usuarios.findOne(options)
+    await t.commit()
     res.send(tmpUsuario)
   } catch (error) {
     await t.rollback();
@@ -186,5 +216,6 @@ export {
   findOne,
   findAll,
   createOne,
-  updateOne
+  updateOne,
+  findByIdentification
 };

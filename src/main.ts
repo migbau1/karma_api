@@ -20,7 +20,7 @@ import documentRoute from './router/generatedocument'
 
 const app: Express = express();
 
-const whitelist = ["https://karma-app-roan.vercel.app", "http://localhost:3000"];
+const whitelist = ["https://karma-app-roan.vercel.app", "http://localhost:3000", "http://127.0.0.1:3000"];
 
 const corsOptions: CorsOptions = {
   allowedHeaders: ["Origin, X-Requested-With, Content-Type, Accept", "Access-Control-Allow-Credentials"],

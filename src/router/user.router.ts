@@ -1,6 +1,6 @@
 import { Router as router } from 'express'
 import passport from 'passport'
-import { createOne, findAll, findOne, updateOne } from '../controller/user.controller'
+import { createOne, findAll, findByIdentification, findOne, updateOne } from '../controller/user.controller'
 import { checkUserRole } from '../controller/access-control/login.controller';
 import Roles from '../utils/roles/roles.pointer';
 

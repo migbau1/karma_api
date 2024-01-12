@@ -38,7 +38,10 @@ const userModelDefiner = (sequelize: Sequelize) => {
         cedula: {
             allowNull: false,
             type: DataTypes.STRING(50),
-            unique: true,
+            unique: {
+                name: 'cedula',
+                msg: "Ya existe un usuario con esta identificación"
+            },
         },
         telefono: {
             type: DataTypes.TEXT,

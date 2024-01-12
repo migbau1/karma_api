@@ -51,7 +51,7 @@ async function exportEncomienda(req: Request, res: Response) {
 
     try {
         const tmpEncomienda = await encomiendaModel.findByPk(tmpId, options)
-        const tmpSede = await sedeModel.findByPk(req.user?.sedeId)
+        const tmpSede = await sedeModel.findByPk(req.user?.sedeId, { transaction })
 
         if (!tmpEncomienda) {
             return res.status(404).json({
@@ -442,8 +442,8 @@ async function exportEncomienda(req: Request, res: Response) {
             ]
         ]);
 
+        await transaction.commit()
         res.end(wbbuf)
-        res.send()
     } catch (error) {
         console.log(error);
 

@@ -16,6 +16,7 @@ const wb = new Excel.Workbook()
 
 async function exportEncomienda(req: Request, res: Response) {
 
+    const code = v4();
     const transaction = await sequelize.transaction()
     const tmpId = req.params.id
 
@@ -67,125 +68,78 @@ async function exportEncomienda(req: Request, res: Response) {
             producto,
             registro,
             facturacion,
-            descripcion, sede } = tmpEncomienda
+            descripcion, sede, id } = tmpEncomienda
+
+
+        /**
+         * Apartado de Informacion de la empresa - HEADER
+         */
+        ws.getRow(2).getCell(8).value = "ENVIOS ANAYA"
+        ws.getRow(3).getCell(8).value = "NIT. 901.661.421-1"
+        ws.getRow(4).getCell(8).value = "DIR. CLL 33 # 19-64 CENTRO B/MANGA"
+        ws.getRow(5).getCell(8).value = "TEL: 3103048782"
+        //codigoDebarras
+        ws.getRow(3).getCell(12).value = code;
+        //consecutivo
+        ws.getRow(3).getCell(23).value = id || "XXXX";
+        //=======================================================
+        ws.getRow(28).getCell(8).value = "ENVIOS ANAYA"
+        ws.getRow(29).getCell(8).value = "NIT. 901.661.421-1"
+        ws.getRow(30).getCell(8).value = "DIR. CLL 33 # 19-64 CENTRO B/MANGA"
+        ws.getRow(31).getCell(8).value = "TEL: 3103048782"
+        //codigoDebarras
+        ws.getRow(29).getCell(12).value = code;
+        //consecutivo
+        ws.getRow(29).getCell(23).value = id || "XXXX";
+        //=======================================================
+        ws.getRow(54).getCell(8).value = "ENVIOS ANAYA"
+        ws.getRow(55).getCell(8).value = "NIT. 901.661.421-1"
+        ws.getRow(56).getCell(8).value = "DIR. CLL 33 # 19-64 CENTRO B/MANGA"
+        ws.getRow(57).getCell(8).value = "TEL: 3103048782"
+        //codigoDebarras
+        ws.getRow(55).getCell(12).value = code;
+        //consecutivo
+        ws.getRow(55).getCell(23).value = id || "XXXX";
+
 
         if (remitente) {
+            /**
+             * Acá van todas las celdas con información del remitente, para las tres guias
+             */
+
             //  Remitente Nombre
-            ws.getRow(8).getCell(2).value = (
-                "Remite: " +
-                remitente.nombre +
-                " " +
-                remitente.apellido
-            ).toUpperCase();
-            //id remitente
-            ws.getRow(12).getCell(6).value = parseInt(remitente.cedula);
-
-            if (remitente.cedula.includes("-")) {
-                const val = remitente.cedula.indexOf("-");
-                const nu = remitente.cedula.charAt(val + 1);
-                ws.getRow(12).getCell(7).value = nu;
-            } else {
-                ws.getRow(12).getCell(7).value = "";
-            }
-            //telefono remitente
-            ws.getRow(12).getCell(4).value = remitente.telefono;
-            //factura 2 ==============================================================================
-            ws.getRow(34).getCell(2).value = (
-                "Remite: " +
-                remitente.nombre +
-                " " +
-                remitente.apellido
-            ).toUpperCase();
-            //id remitente
-            ws.getRow(38).getCell(6).value = parseInt(remitente.cedula);
-
-            if (remitente.cedula.includes("-")) {
-                const val = remitente.cedula.indexOf("-");
-                const nu = remitente.cedula.charAt(val + 1);
-                ws.getRow(38).getCell(7).value = nu;
-            } else {
-                ws.getRow(38).getCell(7).value = "";
-            }
-            //telefono remitente
-            ws.getRow(38).getCell(4).value = remitente.telefono;
-            //factura 3 ==============================================================================
-            ws.getRow(60).getCell(2).value = (
-                "Remite: " +
-                remitente.nombre +
-                " " +
-                remitente.apellido
-            ).toUpperCase();
-            //id remitente
-            ws.getRow(64).getCell(6).value = parseInt(remitente.cedula);
-            if (remitente.cedula.includes("-")) {
-                const val = remitente.cedula.indexOf("-");
-                const nu = remitente.cedula.charAt(val + 1);
-                ws.getRow(64).getCell(7).value = nu;
-            } else {
-                ws.getRow(64).getCell(7).value = "";
-            }
-            //telefono remitente
-            ws.getRow(64).getCell(4).value = remitente.telefono;
+            ws.getRow(8).getCell(2).value = (`Remite: ${remitente.nombre} ${remitente.apellido}`).toUpperCase();
+            ws.getRow(12).getCell(4).value = remitente.telefono
+            ws.getRow(12).getCell(6).value = remitente.cedula
+            //  Remitente Nombre
+            ws.getRow(34).getCell(2).value = (`Remite: ${remitente.nombre} ${remitente.apellido}`).toUpperCase();
+            ws.getRow(38).getCell(4).value = remitente.telefono
+            ws.getRow(38).getCell(6).value = remitente.cedula
+            //  Remitente Nombre
+            ws.getRow(60).getCell(2).value = (`Remite: ${remitente.nombre} ${remitente.apellido}`).toUpperCase();
+            ws.getRow(64).getCell(4).value = remitente.telefono
+            ws.getRow(64).getCell(6).value = remitente.cedula
         }
 
         if (destinatario) {
-            //Destinatario Nombre
-            ws.getRow(8).getCell(8).value = (
-                "Destinatario: " +
-                destinatario.nombre +
-                " " +
-                destinatario.apellido
-            ).toUpperCase();
-            //telefono destinatario
-            ws.getRow(12).getCell(10).value = destinatario.telefono;
-            //id destinatario
-            ws.getRow(12).getCell(12).value = destinatario.cedula;
-            if (destinatario.cedula.includes("-")) {
-                const val = destinatario.cedula.indexOf("-");
-                const nu = destinatario.cedula.charAt(val + 1);
-                ws.getRow(12).getCell(13).value = nu;
-            } else {
-                ws.getRow(12).getCell(13).value = "";
-            }
-            //factura 2 ================================================================================
-            //Destinatario Nombre
-            ws.getRow(34).getCell(8).value = (
-                "Destinatario: " +
-                destinatario.nombre +
-                " " +
-                destinatario.apellido
-            ).toUpperCase();
-            //telefono destinatario
-            ws.getRow(38).getCell(10).value = destinatario.telefono;
-            //id destinatario
-            ws.getRow(38).getCell(12).value = destinatario.cedula;
-            if (destinatario.cedula.includes("-")) {
-                const val = destinatario.cedula.indexOf("-");
-                const nu = destinatario.cedula.charAt(val + 1);
-                ws.getRow(38).getCell(13).value = nu;
-            } else {
-                ws.getRow(38).getCell(13).value = "";
-            }
-            //factura 3 ================================================================================
-            //Destinatario Nombre
-            ws.getRow(60).getCell(8).value = (
-                "Destinatario: " +
-                destinatario.nombre +
-                " " +
-                destinatario.apellido
-            ).toUpperCase();
-            //telefono destinatario
-            ws.getRow(64).getCell(10).value = destinatario.telefono;
-            //id destinatario
-            ws.getRow(64).getCell(12).value = destinatario.cedula;
-            if (destinatario.cedula.includes("-")) {
-                const val = destinatario.cedula.indexOf("-");
-                const nu = destinatario.cedula.charAt(val + 1);
-                ws.getRow(64).getCell(13).value = nu;
-            } else {
-                ws.getRow(64).getCell(13).value = "";
-            }
+            /**
+             * Acá van todas las celdas con información del remitente, para las tres guias
+             */
+
+            //  Remitente Nombre
+            ws.getRow(8).getCell(8).value = (`Remite: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
+            ws.getRow(12).getCell(10).value = destinatario.telefono
+            ws.getRow(12).getCell(12).value = destinatario.cedula
+            //  Remitente Nombre
+            ws.getRow(34).getCell(8).value = (`Remite: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
+            ws.getRow(38).getCell(10).value = destinatario.telefono
+            ws.getRow(38).getCell(12).value = destinatario.cedula
+            //  Remitente Nombre
+            ws.getRow(60).getCell(8).value = (`Remite: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
+            ws.getRow(64).getCell(10).value = destinatario.telefono
+            ws.getRow(64).getCell(12).value = destinatario.cedula
         }
+
         if (origen) {
             //direccion origen
             ws.getRow(10).getCell(2).value = origen.direccion;
@@ -246,16 +200,16 @@ async function exportEncomienda(req: Request, res: Response) {
 
         if (producto) {
             // //producto
-            ws.getRow(7).getCell(4).value = producto.tipoProducto;
+            ws.getRow(7).getCell(4).value = "Paqueteo";
             //Piezas
             ws.getRow(9).getCell(24).value = producto.cantidad;
             //Peso total
-            ws.getRow(12).getCell(18).value = producto.peso;
+            ws.getRow(12).getCell(18).value = String(producto.peso);
             //Valor declarado producto
             ws.getRow(13).getCell(18).value = producto.valorDeclarado;
             // Factura 2 ========================================================================================
             //producto
-            ws.getRow(33).getCell(4).value = producto.tipoProducto;
+            ws.getRow(33).getCell(4).value = "Paqueteo";
             //Piezas
             ws.getRow(35).getCell(24).value = producto.cantidad;
             //Peso total
@@ -264,7 +218,7 @@ async function exportEncomienda(req: Request, res: Response) {
             ws.getRow(39).getCell(18).value = producto.valorDeclarado;
             // Factura 3 ========================================================================================
             //producto
-            ws.getRow(59).getCell(4).value = producto.tipoProducto;
+            ws.getRow(59).getCell(4).value = "Paqueteo";
             //Piezas
             ws.getRow(61).getCell(24).value = producto.cantidad;
             //Peso total
@@ -274,9 +228,9 @@ async function exportEncomienda(req: Request, res: Response) {
 
             //==============================================================
             //peso cob
-            ws.getRow(10).getCell(24).value = producto.pesoCob;
+            ws.getRow(10).getCell(24).value = String(producto.pesoCob);
             //peso vol
-            ws.getRow(11).getCell(24).value = producto.pesoVol;
+            ws.getRow(11).getCell(24).value = String(producto.pesoVol);
             //fecha admision
             ws.getRow(6).getCell(24).value = fecha.date;
             //Hora Admision
@@ -286,59 +240,31 @@ async function exportEncomienda(req: Request, res: Response) {
             // //Observaciones generales
 
             //peso cob
-            ws.getRow(36).getCell(24).value = producto.pesoCob;
+            ws.getRow(36).getCell(24).value = String(producto.pesoCob);
             //peso vol
-            ws.getRow(37).getCell(24).value = producto.pesoVol;
+            ws.getRow(37).getCell(24).value = String(producto.pesoVol);
 
             //==============================================================
             //peso cob
-            ws.getRow(62).getCell(24).value = producto.pesoCob;
+            ws.getRow(62).getCell(24).value = String(producto.pesoCob);
             //peso vol
-            ws.getRow(63).getCell(24).value = producto.pesoVol;
+            ws.getRow(63).getCell(24).value = String(producto.pesoVol);
 
 
-            ws.getRow(17).getCell(18).value = (
-                producto.nombre +
-                " con " +
-                producto.descripcion
-            ).toUpperCase();
-            ws.getRow(43).getCell(18).value = (
-                producto.nombre +
-                " con " +
-                producto.descripcion
-            ).toUpperCase();
-            ws.getRow(69).getCell(18).value = (
-                producto.nombre +
-                " con " +
-                producto.descripcion
-            ).toUpperCase();
+            ws.getRow(17).getCell(18).value = (producto.nombre).toUpperCase();
+            ws.getRow(43).getCell(18).value = (producto.nombre).toUpperCase();
+            ws.getRow(69).getCell(18).value = (producto.nombre).toUpperCase();
         }
 
         if (tmpSede) {
-            //===================================================
-            const code = v4();
-            //consecutivo
-            ws.getRow(3).getCell(23).value = "consecutivo";
-            //codigoDebarras
-            ws.getRow(3).getCell(12).value = code;
             //punto Servicio
             ws.getRow(6).getCell(5).value = tmpSede.nombre;
             //generado por
             ws.getRow(6).getCell(11).value = req.user?.nombre || '';
-            //Factura 2===================================================
-            //consecutivo
-            ws.getRow(29).getCell(23).value = "consecutivo";
-            //codigoDebarras
-            ws.getRow(29).getCell(12).value = code;
             //punto Servicio
             ws.getRow(32).getCell(5).value = tmpSede.nombre;
             //generado por
             ws.getRow(32).getCell(11).value = req.user?.nombre || '';
-            //Factura 3===================================================
-            //consecutivo
-            ws.getRow(55).getCell(23).value = "consecutivo";
-            //codigoDebarras
-            ws.getRow(55).getCell(12).value = code;
             //punto Servicio
             ws.getRow(58).getCell(5).value = tmpSede.nombre;
             //generado por
@@ -346,7 +272,7 @@ async function exportEncomienda(req: Request, res: Response) {
         }
 
         if (facturacion) {
-
+            const total = facturacion.valorFlete + facturacion.otrosCobros + facturacion.valorSeguro + facturacion.recargos - facturacion.descuentos
             //Valor seguro
             ws.getRow(12).getCell(24).value = facturacion.valorSeguro;
             //Otros cobros
@@ -358,7 +284,7 @@ async function exportEncomienda(req: Request, res: Response) {
             //Valor descuento
             ws.getRow(15).getCell(24).value = facturacion.descuentos;
             //Valor a cobrar
-            ws.getRow(16).getCell(24).value = 'cobrar';
+            ws.getRow(16).getCell(24).value = total;
             //Forma de pago
             ws.getRow(7).getCell(11).value = 'forma pago';
 
@@ -376,7 +302,7 @@ async function exportEncomienda(req: Request, res: Response) {
             //Valor descuento
             ws.getRow(41).getCell(24).value = facturacion.descuentos;
             //Valor a cobrar
-            ws.getRow(42).getCell(24).value = 'cobrar';
+            ws.getRow(42).getCell(24).value = total;
             //Forma de pago
             ws.getRow(33).getCell(11).value = 'forma pago';
             //fecha admision
@@ -398,10 +324,6 @@ async function exportEncomienda(req: Request, res: Response) {
             ws.getRow(66).getCell(24).value = facturacion.recargos;
             //Valor descuento
             ws.getRow(67).getCell(24).value = facturacion.descuentos;
-            //Valor a cobrar
-            ws.getRow(68).getCell(24).value = 'cobrar';
-            //Forma de pago
-            ws.getRow(59).getCell(11).value = 'forma pago';
             //fecha admision
             ws.getRow(58).getCell(24).value = fecha.date;
             //Hora Admision
@@ -410,17 +332,21 @@ async function exportEncomienda(req: Request, res: Response) {
             ws.getRow(60).getCell(18).value = "Terrestre";
             //Observaciones generales
             ws.getRow(71).getCell(2).value = descripcion;
+            //Valor a cobrar
+            ws.getRow(68).getCell(24).value = total;
         }
-
-
-
-
 
 
         //servicio
         ws.getRow(7).getCell(8).value = "Domicilio";
         ws.getRow(33).getCell(8).value = "Domicilio";
         ws.getRow(59).getCell(8).value = "Domicilio";
+
+        const msg = `El usuario manifiesta que conoce los terminos y condiciones del contrato que encontro publicado en el punto de venta y/o suministro el operador para la lectura, cuyo contenido acepta con la suscripcion de este documento. Para efecto de PQR el usuario podra manifestarlas a traves de las lineas telefonicas de atencion al cliente Tel. 3103048782 o a los correos electronicos enviosanayasas@gmail.com`
+
+        ws.getRow(21).getCell(5).value = msg;
+        ws.getRow(47).getCell(5).value = msg;
+        ws.getRow(73).getCell(5).value = msg;
 
 
         ws.eachRow((row) => row.commit());

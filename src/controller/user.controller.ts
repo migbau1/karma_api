@@ -78,7 +78,7 @@ const updateOne = async (req: Request, res: Response) => {
         tmpUser.ubicacion.municipio = ubicacion?.municipio
         tmpUser.ubicacion.direccion = ubicacion?.direccion
         tmpUser.ubicacion.codigoPostal = ubicacion?.codigoPostal
-        await tmpUser.ubicacion.save()
+        await tmpUser.ubicacion.save({ transaction: t })
       } else if (ubicacion) {
         const tmpUbicacion = await ubicaciones.create({
           departamento: ubicacion.departamento,
@@ -87,21 +87,20 @@ const updateOne = async (req: Request, res: Response) => {
           codigoPostal: ubicacion.codigoPostal
         }, { transaction: t })
 
-        tmpUser.ubicacion = tmpUbicacion
+        tmpUser.ubicacionId = tmpUbicacion.id
       }
-      await tmpUser.save()
+
+      console.log(tmpUser);
+
+
+      await tmpUser.save({ transaction: t })
     }
 
 
     await t.commit();
     res.send(tmpUser)
   } catch (error: any) {
-    console.error(error);
-    res.send({
-      name: error.name,
-      type: error.parent.routine,
-      message: "ups, an error has occurred",
-    });
+    res.status(500).send(error.errors[0]);
     await t.rollback();
   }
 }
@@ -111,7 +110,7 @@ const findAll = async (
   res: Response
 ) => {
   const t = await sequelize.transaction()
-  const { includes, widthAdmins = false, limit = 5, offset = 0, cedula } = req.query
+  const { includes, widthAdmins = false, limit = 5, offset = 0, cedula, departamento, municipio, search } = req.query
   let options: FindOptions<InferAttributes<IUserModel, { omit: never; }>> | undefined = {}
   let tmpWhere: WhereOptions<InferAttributes<IUserModel>> = {}
   options.subQuery = false
@@ -134,6 +133,48 @@ const findAll = async (
       tmpWhere.roleId = {
         [Op.in]: [Roles.admin]
       }
+    }
+
+    if (departamento) {
+      tmpWhere["$ubicacion.departamento$"] = departamento
+    }
+
+    if (municipio) {
+      tmpWhere["$ubicacion.municipio$"] = municipio
+    }
+
+
+    if (search) {
+      tmpWhere = {
+        ...tmpWhere,
+        [Op.or]: [
+          {
+            nombre: {
+              [Op.like]: `%${search}%`
+            }
+          },
+          {
+            apellido: {
+              [Op.like]: `%${search}%`
+            }
+          },
+          {
+            cedula: {
+              [Op.like]: `%${search}%`
+            }
+          },
+          {
+            ["$ubicacion.departamento$"]: {
+              [Op.like]: `%${search}%`
+            }
+          },
+          {
+            ["$ubicacion.municipio$"]: {
+              [Op.like]: `%${search}%`
+            }
+          },
+        ]
+      } as typeof tmpWhere
     }
 
     options.where = tmpWhere

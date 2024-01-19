@@ -1,4 +1,4 @@
-import { FindOptions, Includeable, InferAttributes, ModelCtor, Op, WhereOptions } from 'sequelize'
+import { FindOptions, Includeable, InferAttributes, ModelCtor, Op, WhereOptions, col, fn, where } from 'sequelize'
 import sequelize from '../database/connection'
 import { Request, RequestHandler, Response } from 'express';
 import { IUserModel } from '../database/models/Usuarios';
@@ -110,7 +110,7 @@ const findAll = async (
   res: Response
 ) => {
   const t = await sequelize.transaction()
-  const { includes, widthAdmins = false, limit = 5, offset = 0, cedula, departamento, municipio, search } = req.query
+  const { includes, widthAdmins = false, limit = 5, offset = 0, cedula, departamento, municipio, search, order } = req.query
   let options: FindOptions<InferAttributes<IUserModel, { omit: never; }>> | undefined = {}
   let tmpWhere: WhereOptions<InferAttributes<IUserModel>> = {}
   options.subQuery = false
@@ -143,11 +143,17 @@ const findAll = async (
       tmpWhere["$ubicacion.municipio$"] = municipio
     }
 
+    if (order) {
+      options.order = [['createdAt', order as string]]
+    }
 
     if (search) {
       tmpWhere = {
         ...tmpWhere,
         [Op.or]: [
+          where(fn("concat", col("nombre"),' ', col("apellido")), {
+            [Op.like]: `%${search}%`
+          }),
           {
             nombre: {
               [Op.like]: `%${search}%`

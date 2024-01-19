@@ -1,4 +1,4 @@
-import { FindOptions, Includeable, InferAttributes, ModelCtor, Op, WhereOptions } from 'sequelize';
+import { FindOptions, Includeable, InferAttributes, ModelCtor, Op, WhereOptions, col, fn, where } from 'sequelize';
 import sequelize from '../database/connection'
 import { IEncomiendaModel } from '../database/models/Encomienda';
 import { Request, Response } from 'express';
@@ -10,6 +10,7 @@ import { IProductoModel } from '../database/models/Producto';
 import { IRegistroModel } from '../database/models/Registro';
 import { IFacturacionModel } from '../database/models/Facturacion';
 import IEncomiendaUpdateDto from '../dto/encomienda/update.dto';
+import dayjs, { Dayjs } from 'dayjs';
 
 const encomiendaModel = sequelize.model('encomiendas') as ModelCtor<IEncomiendaModel>
 const usuarioModel = sequelize.model('usuarios') as ModelCtor<IUserModel>
@@ -218,7 +219,9 @@ const findAll = async (req: Request, res: Response) => {
     origenMunicipio,
     destinoDepartamento,
     destinoMunicipio,
-    search
+    search,
+    dateRange,
+    order
   } = req.query
   const transaction = await sequelize.transaction()
   let options: FindOptions<InferAttributes<IEncomiendaModel, { omit: never; }>> = {
@@ -257,6 +260,18 @@ const findAll = async (req: Request, res: Response) => {
       tmpWhere["$destino.municipio$"] = destinoMunicipio
     }
 
+    if (dateRange) {
+      const tmpDates = dateRange as string[]
+
+      tmpWhere["createdAt"] = {
+        [Op.between]: [tmpDates[0], tmpDates[1]]
+      }
+    }
+
+    if (order) {
+      options.order = [['createdAt', order as string]]
+    }
+
     const findId = !!Number(search) && Number(search)
 
 
@@ -268,6 +283,12 @@ const findAll = async (req: Request, res: Response) => {
         tmpWhere = {
           ...tmpWhere,
           [Op.or]: [
+            where(fn("concat", col("remitente.nombre"), ' ', col("remitente.apellido")), {
+              [Op.like]: `%${search}%`
+            }),
+            where(fn("concat", col("destinatario.nombre"), ' ', col("destinatario.apellido")), {
+              [Op.like]: `%${search}%`
+            }),
             {
               ["$remitente.nombre$"]: {
                 [Op.like]: `%${search}%`
@@ -308,11 +329,11 @@ const findAll = async (req: Request, res: Response) => {
 
     await transaction.commit()
     res.send(tmpEnconmiendas)
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
 
     await transaction.rollback()
-    res.send(error)
+    res.status(500).send(error);
   }
 }
 

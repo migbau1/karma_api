@@ -133,7 +133,7 @@ const createOne = async (req: Request, res: Response) => {
     res.send(tmpFacturacion.get())
   } catch (error: any) {
     await transaction.rollback()
-    res.status(500).send(error.errors[0])
+    res.status(500).send(error)
   }
 }
 

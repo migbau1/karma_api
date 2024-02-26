@@ -129,15 +129,15 @@ async function exportEncomienda(req: Request, res: Response) {
              */
 
             //  Remitente Nombre
-            ws.getRow(8).getCell(8).value = (`Remite: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
+            ws.getRow(8).getCell(8).value = (`Destinatario: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
             ws.getRow(12).getCell(10).value = destinatario.telefono
             ws.getRow(12).getCell(12).value = destinatario.cedula
             //  Remitente Nombre
-            ws.getRow(34).getCell(8).value = (`Remite: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
+            ws.getRow(34).getCell(8).value = (`Destinatario: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
             ws.getRow(38).getCell(10).value = destinatario.telefono
             ws.getRow(38).getCell(12).value = destinatario.cedula
             //  Remitente Nombre
-            ws.getRow(60).getCell(8).value = (`Remite: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
+            ws.getRow(60).getCell(8).value = (`Destinatario: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
             ws.getRow(64).getCell(10).value = destinatario.telefono
             ws.getRow(64).getCell(12).value = destinatario.cedula
         }

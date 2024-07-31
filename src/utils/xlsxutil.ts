@@ -21,7 +21,7 @@ async function exportEncomienda(req: Request, res: Response) {
     const tmpId = req.params.id
 
     const workbook = await wb.xlsx.readFile(
-        path.resolve(__dirname, "../templates/TEMPLATEGUIA.xlsx")
+        path.resolve(__dirname, "../templates/TEMPLATE_BYA.xlsx")
     );
     let ws = workbook.getWorksheet("hoja1")!;
 
@@ -76,28 +76,28 @@ async function exportEncomienda(req: Request, res: Response) {
         /**
          * Apartado de Informacion de la empresa - HEADER
          */
-        ws.getRow(2).getCell(8).value = "ENVIOS ANAYA"
-        ws.getRow(3).getCell(8).value = "NIT. 901.661.421-1"
-        ws.getRow(4).getCell(8).value = "DIR. CLL 33 # 19-64 CENTRO B/MANGA"
-        ws.getRow(5).getCell(8).value = "TEL: 3103048782 - 3144099530"
+        ws.getRow(2).getCell(8).value = "EMPRESA DE SERVICIOS LOGISTICA Y TRANSPORTE DE CARGA B&A SAS"
+        ws.getRow(3).getCell(8).value = "NIT. 900.544.631-7"
+        ws.getRow(4).getCell(8).value = "Carrera 23# 19- 14, san francisco"
+        ws.getRow(5).getCell(8).value = "ATENCION AL CLIENTE:  3206461453"
         //codigoDebarras
         ws.getRow(3).getCell(12).value = code;
         //consecutivo
         ws.getRow(3).getCell(23).value = id || "XXXX";
         //=======================================================
-        ws.getRow(28).getCell(8).value = "ENVIOS ANAYA"
-        ws.getRow(29).getCell(8).value = "NIT. 901.661.421-1"
-        ws.getRow(30).getCell(8).value = "DIR. CLL 33 # 19-64 CENTRO B/MANGA"
-        ws.getRow(31).getCell(8).value = "TEL: 3103048782 - 3144099530"
+        ws.getRow(28).getCell(8).value = "EMPRESA DE SERVICIOS LOGISTICA Y TRANSPORTE DE CARGA B&A SAS"
+        ws.getRow(29).getCell(8).value = "NIT. 900.544.631-7"
+        ws.getRow(30).getCell(8).value = "Carrera 23# 19- 14, san francisco"
+        ws.getRow(31).getCell(8).value = "ATENCION AL CLIENTE:  3206461453"
         //codigoDebarras
         ws.getRow(29).getCell(12).value = code;
         //consecutivo
         ws.getRow(29).getCell(23).value = id || "XXXX";
         //=======================================================
-        ws.getRow(54).getCell(8).value = "ENVIOS ANAYA"
-        ws.getRow(55).getCell(8).value = "NIT. 901.661.421-1"
-        ws.getRow(56).getCell(8).value = "DIR. CLL 33 # 19-64 CENTRO B/MANGA"
-        ws.getRow(57).getCell(8).value = "TEL: 3103048782 - 3144099530"
+        ws.getRow(54).getCell(8).value = "EMPRESA DE SERVICIOS LOGISTICA Y TRANSPORTE DE CARGA B&A SAS"
+        ws.getRow(55).getCell(8).value = "NIT. 900.544.631-7"
+        ws.getRow(56).getCell(8).value = "Carrera 23# 19- 14, san francisco"
+        ws.getRow(57).getCell(8).value = "ATENCION AL CLIENTE:  3206461453"
         //codigoDebarras
         ws.getRow(55).getCell(12).value = code;
         //consecutivo
@@ -129,15 +129,15 @@ async function exportEncomienda(req: Request, res: Response) {
              */
 
             //  Remitente Nombre
-            ws.getRow(8).getCell(8).value = (`Remite: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
+            ws.getRow(8).getCell(8).value = (`Destinatario: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
             ws.getRow(12).getCell(10).value = destinatario.telefono
             ws.getRow(12).getCell(12).value = destinatario.cedula
             //  Remitente Nombre
-            ws.getRow(34).getCell(8).value = (`Remite: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
+            ws.getRow(34).getCell(8).value = (`Destinatario: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
             ws.getRow(38).getCell(10).value = destinatario.telefono
             ws.getRow(38).getCell(12).value = destinatario.cedula
             //  Remitente Nombre
-            ws.getRow(60).getCell(8).value = (`Remite: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
+            ws.getRow(60).getCell(8).value = (`Destinatario: ${destinatario.nombre} ${destinatario.apellido}`).toUpperCase();
             ws.getRow(64).getCell(10).value = destinatario.telefono
             ws.getRow(64).getCell(12).value = destinatario.cedula
         }

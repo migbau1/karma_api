@@ -9,6 +9,7 @@ import cors, { CorsOptions } from 'cors'
 import passport from 'passport'
 import session from 'express-session'
 import cookieParser from 'cookie-parser'
+import formidable from 'formidable'
 
 // Routes ****************************************************************
 import userRoute from './router/user.router'
@@ -17,8 +18,12 @@ import sedeRoute from './router/sede.router'
 import loginRoute from './router/access-control/login.route'
 import registerRoute from './router/access-control/register.router'
 import documentRoute from './router/generatedocument'
+import wpRoute from './router/wp.router'
 
 const app: Express = express();
+
+// Middleware para parsear datos binarios
+app.use(express.raw({ type: 'application/octet-stream', limit: '10mb' }));
 
 const whitelist = ["https://karma-app-roan.vercel.app", "http://localhost:3000", "http://127.0.0.1:3000"];
 
@@ -58,6 +63,7 @@ app.use("/api/register", registerRoute);
 app.use("/api/encomienda", encomiendaRoute);
 app.use("/api/sede", sedeRoute);
 app.use("/api/docs", documentRoute);
+app.use("/api/wp", wpRoute);
 
 
 async function assertDatabaseConnectionOk() {

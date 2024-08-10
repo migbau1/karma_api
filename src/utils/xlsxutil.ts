@@ -9,6 +9,10 @@ import path from 'path'
 import { ISedeModel } from '../database/models/Sede'
 import { v4 } from 'uuid'
 
+import bwipjs from 'bwip-js';
+import fs from 'fs';
+import sharp from 'sharp';
+
 const encomiendaModel = sequelize.model('encomiendas') as ModelCtor<IEncomiendaModel>
 const sedeModel = sequelize.model('sedes') as ModelCtor<ISedeModel>
 
@@ -24,6 +28,39 @@ async function exportEncomienda(req: Request, res: Response) {
         path.resolve(__dirname, "../templates/TEMPLATE_BYA.xlsx")
     );
     let ws = workbook.getWorksheet("hoja1")!;
+
+    // Genera código de barras como imagen utilizando bwip-js
+    const barcodeBuffer = await bwipjs.toBuffer({
+        bcid: 'code128',
+        text: code,
+        scale: 3,
+        height: 15,
+        includetext: true,
+        textxalign: 'center',
+    });
+
+    // Ruta del directorio temp
+    const tempDir = path.resolve(__dirname, "../temp");
+
+    // Verifica si el directorio existe, y si no, lo crea
+    if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true });
+    }
+
+    // Ahora puedes continuar con la creación del archivo
+    const barcodeFilePath = path.join(tempDir, "barcode.png");
+    fs.writeFileSync(barcodeFilePath, barcodeBuffer);
+
+    const resizedBarcodePath = path.join(tempDir, "barcode_resized.png");
+    await sharp(barcodeFilePath)
+        .resize(700, 150) // Ajusta el tamaño según tus necesidades
+        .toFile(resizedBarcodePath);
+
+    // Agrega el código de barras a la hoja de Excel
+    const imageId = workbook.addImage({
+        filename: resizedBarcodePath,
+        extension: 'png',
+    });
 
     const options: FindOptions<InferAttributes<IEncomiendaModel, { omit: never; }>> = {
         attributes: ['id', 'descripcion'],
@@ -81,7 +118,12 @@ async function exportEncomienda(req: Request, res: Response) {
         ws.getRow(4).getCell(8).value = "Carrera 23# 19- 14, san francisco"
         ws.getRow(5).getCell(8).value = "ATENCION AL CLIENTE:  3206461453"
         //codigoDebarras
-        ws.getRow(3).getCell(12).value = code;
+        // ws.getRow(3).getCell(12).value = code;
+
+        ws.addImage(imageId, {
+            tl: { col: 11, row: 2 }, // Ajusta la posición según tus necesidades
+            ext: { width: 300, height: 60 }, // Ajusta el tamaño según tus necesidades
+        });
         //consecutivo
         ws.getRow(3).getCell(23).value = id || "XXXX";
         //=======================================================
@@ -90,7 +132,11 @@ async function exportEncomienda(req: Request, res: Response) {
         ws.getRow(30).getCell(8).value = "Carrera 23# 19- 14, san francisco"
         ws.getRow(31).getCell(8).value = "ATENCION AL CLIENTE:  3206461453"
         //codigoDebarras
-        ws.getRow(29).getCell(12).value = code;
+        // ws.getRow(29).getCell(12).value = code;
+        ws.addImage(imageId, {
+            tl: { col: 11, row: 28 }, // Ajusta la posición según tus necesidades
+            ext: { width: 300, height: 60 }, // Ajusta el tamaño según tus necesidades
+        });
         //consecutivo
         ws.getRow(29).getCell(23).value = id || "XXXX";
         //=======================================================
@@ -99,7 +145,11 @@ async function exportEncomienda(req: Request, res: Response) {
         ws.getRow(56).getCell(8).value = "Carrera 23# 19- 14, san francisco"
         ws.getRow(57).getCell(8).value = "ATENCION AL CLIENTE:  3206461453"
         //codigoDebarras
-        ws.getRow(55).getCell(12).value = code;
+        // ws.getRow(55).getCell(12).value = code;
+        ws.addImage(imageId, {
+            tl: { col: 11, row: 54 }, // Ajusta la posición según tus necesidades
+            ext: { width: 300, height: 60 }, // Ajusta el tamaño según tus necesidades
+        });
         //consecutivo
         ws.getRow(55).getCell(23).value = id || "XXXX";
 
@@ -346,7 +396,7 @@ async function exportEncomienda(req: Request, res: Response) {
         ws.getRow(33).getCell(8).value = "Domicilio";
         ws.getRow(59).getCell(8).value = "Domicilio";
 
-        const msg = `El usuario manifiesta que conoce los terminos y condiciones del contrato que encontro publicado en el punto de venta y/o suministro el operador para la lectura, cuyo contenido acepta con la suscripcion de este documento. Para efecto de PQR el usuario podra manifestarlas a traves de las lineas telefonicas de atencion al cliente Tel. 3103048782 - 3144099530 o a los correos electronicos enviosanayasas@gmail.com`
+        const msg = `El usuario manifiesta que conoce los terminos y condiciones del contrato que encontro publicado en el punto de venta y/o suministro el operador para la lectura, cuyo contenido acepta con la suscripcion de este documento. Para efecto de PQR el usuario podra manifestarlas a traves de las lineas telefonicas de atencion al cliente Tel. 3206461453 o a los correos electronicos transcargabyasas@gmail.com`
 
         ws.getRow(21).getCell(5).value = msg;
         ws.getRow(47).getCell(5).value = msg;

@@ -1,64 +1,54 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
-import fs from 'fs'
+import fs from 'fs';
 import FormData from 'form-data';
-import path from 'path';
-import { IncomingForm, File } from 'formidable'
-const url = 'https://graph.facebook.com/v20.0/308265089046877/messages';
-const mediaUrl = 'https://graph.facebook.com/v20.0/308265089046877/media';
+import { IncomingForm, File } from 'formidable';
+
+const WHATSAPP_ID = process.env.WHATSAPP_ID;
 const token = process.env.TOKEN_WHATSAPP;
 
+if (!WHATSAPP_ID || !token) {
+    throw new Error('El servicio de WhatsApp está deshabilitado debido a la falta de configuración del ID o del token');
+}
+
+const BASE_URL = `https://graph.facebook.com/v20.0/${WHATSAPP_ID}`;
+const MESSAGE_URL = `${BASE_URL}/messages`;
+const MEDIA_URL = `${BASE_URL}/media`;
+
+const config = {
+    headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    }
+};
+
 async function sendMessage(req: Request, res: Response) {
-    const { to, msg } = req.body;
+    const { to } = req.body;
 
     const data = {
         messaging_product: 'whatsapp',
-        to: to,
+        to,
         type: 'template',
         template: {
             name: 'hello_world',
-            language: {
-                code: 'en_US'
-            }
-        }
-    };
-
-    const config = {
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            language: { code: 'en_US' }
         }
     };
 
     try {
-        console.log('Request data:', data);
-        console.log('Request headers:', config);
-
-        const response = await axios.post(url, data, config);
-        console.log('Response data:', response.data);
+        const response = await axios.post(MESSAGE_URL, data, config);
         res.json(response.data);
     } catch (error) {
-        if (axios.isAxiosError(error)) {
-            console.error('Error response data:', error.response?.data);
-            res.status(error.response?.status || 500).json({
-                message: error.message,
-                data: error.response?.data
-            });
-        } else {
-            console.error('Unexpected error:', error);
-            res.status(500).json({ message: 'Unexpected error occurred' });
-        }
+        handleAxiosError(error, res);
     }
 }
 
-// Función para subir el documento a WhatsApp
 async function uploadDocument(fileBuffer: Buffer, filename: string) {
-
     const form = new FormData();
     form.append('file', fileBuffer, filename);
     form.append('messaging_product', 'whatsapp');
 
-    const config = {
+    const configWithFormHeaders = {
         headers: {
             ...form.getHeaders(),
             'Authorization': `Bearer ${token}`
@@ -66,95 +56,92 @@ async function uploadDocument(fileBuffer: Buffer, filename: string) {
     };
 
     try {
-        const response = await axios.post(mediaUrl, form, config);
-        return response.data; // Debería incluir media_id
+        const response = await axios.post(MEDIA_URL, form, configWithFormHeaders);
+        return response.data;
     } catch (error) {
         console.error('Error uploading document:', error);
         throw error;
     }
 }
 
-async function sendDocument(req: any, res: Response) {
+async function sendDocument(req: Request, res: Response) {
     const { to } = req.body;
-    const file = req.file[0] as File;
 
-    if (!file) {
+    // Validar que req.file es un array y tiene al menos un archivo
+    if (!req.file || !Array.isArray(req.file) || req.file.length === 0) {
         return res.status(400).json({ message: 'No file uploaded' });
     }
 
+    const file = req.file[0] as File;
+
     try {
-        // Paso 1: Subir el documento y obtener media_id
-        const fileBuffer = fs.readFileSync(file.filepath); // Leer el archivo desde el path temporal
-        
+        const fileBuffer = fs.readFileSync(file.filepath);
         const uploadResponse = await uploadDocument(fileBuffer, file.originalFilename || 'uploaded-document.xlsx');
         const mediaId = uploadResponse.id;
 
-        // Paso 2: Enviar el documento usando media_id con la plantilla 'send_guide' en español
         const data = {
             messaging_product: 'whatsapp',
-            to: to,
+            to,
             type: 'template',
             template: {
-                name: 'send_guide', // Nombre de la plantilla
-                language: {
-                    code: 'es' // Código de idioma para español
-                },
-                components: [
-                    {
-                        type: 'header',
-                        parameters: [
-                            {
-                                type: 'document',
-                                document: {
-                                    id: mediaId, // ID del documento subido
-                                    filename: file.originalFilename || 'uploaded-document.xlsx'
-                                }
-                            }
-                        ]
-                    }
-                ]
+                name: 'send_guide',
+                language: { code: 'es' },
+                components: [{
+                    type: 'header',
+                    parameters: [{
+                        type: 'document',
+                        document: {
+                            id: mediaId,
+                            filename: file.originalFilename || 'uploaded-document.xlsx'
+                        }
+                    }]
+                }]
             }
         };
 
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        };
-
-        const response = await axios.post(url, data, config);
+        const response = await axios.post(MESSAGE_URL, data, config);
         res.json(response.data);
     } catch (error) {
-        if (axios.isAxiosError(error)) {
-            res.status(error.response?.status || 500).json({
-                message: error.message,
-                data: error.response?.data
-            });
-        } else {
-            console.log(error);
-            
-            res.status(500).json({ message: 'Unexpected error occurred' });
-        }
+        handleAxiosError(error, res);
     }
 }
 
-// Middleware para procesar `form-data`
-function parseFormData(req: any, res: Response, next: () => void) {
-    const form = new IncomingForm();
-    form.parse(req, (err, fields, files) => {
-        if (err) {
-            return res.status(400).json({ message: 'Error parsing form data' });
-        }
+async function parseFormData(req: Request, res: Response, next: () => void) {
+    try {
+        const form = new IncomingForm();
+
+        const { fields, files } = await new Promise<{ fields: any; files: any }>((resolve, reject) => {
+            form.parse(req, (err, fields, files) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve({ fields, files });
+            });
+        });
+
         req.body = fields;
-        req.file = files.file; // Asumiendo que hay un solo archivo
+        req.file = files.file; // Assuming there is only one file
         next();
-    });
+    } catch (err) {
+        res.status(400).json({ message: 'Error parsing form data' });
+    }
 }
 
+function handleAxiosError(error: any, res: Response) {
+    if (axios.isAxiosError(error)) {
+        console.error('Error response data:', error.response?.data);
+        res.status(error.response?.status || 500).json({
+            message: error.message,
+            data: error.response?.data
+        });
+    } else {
+        console.error('Unexpected error:', error);
+        res.status(500).json({ message: 'Unexpected error occurred' });
+    }
+}
 
 export {
     sendMessage,
     sendDocument,
     parseFormData
-}
+};

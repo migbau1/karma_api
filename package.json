@@ -39,6 +39,7 @@
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "formidable": "^3.5.1",
+    "jimp": "^0.22.12",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
@@ -47,7 +48,6 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "sequelize": "^6.34.0",
-    "sharp": "^0.33.4",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

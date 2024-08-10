@@ -11,7 +11,7 @@ import { v4 } from 'uuid'
 
 import bwipjs from 'bwip-js';
 import fs from 'fs';
-import sharp from 'sharp';
+import Jimp from 'jimp';
 
 const encomiendaModel = sequelize.model('encomiendas') as ModelCtor<IEncomiendaModel>
 const sedeModel = sequelize.model('sedes') as ModelCtor<ISedeModel>
@@ -52,9 +52,9 @@ async function exportEncomienda(req: Request, res: Response) {
     fs.writeFileSync(barcodeFilePath, barcodeBuffer);
 
     const resizedBarcodePath = path.join(tempDir, "barcode_resized.png");
-    await sharp(barcodeFilePath)
-        .resize(700, 150) // Ajusta el tamaño según tus necesidades
-        .toFile(resizedBarcodePath);
+    const barcodeImage = await Jimp.read(barcodeFilePath);
+    barcodeImage.resize(700, 150); // Ajusta el tamaño según tus necesidades
+    await barcodeImage.writeAsync(resizedBarcodePath);
 
     // Agrega el código de barras a la hoja de Excel
     const imageId = workbook.addImage({

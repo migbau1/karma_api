@@ -19,7 +19,7 @@ import loginRoute from './router/access-control/login.route'
 import registerRoute from './router/access-control/register.router'
 import documentRoute from './router/generatedocument'
 import wpRoute from './router/wp.router'
-import staticsRoute from './router/statics.router'
+import statisticsRoute from './router/statistics.router'
 
 const app: Express = express();
 
@@ -65,7 +65,7 @@ app.use("/api/encomienda", encomiendaRoute);
 app.use("/api/sede", sedeRoute);
 app.use("/api/docs", documentRoute);
 app.use("/api/wp", wpRoute);
-app.use("/api/statics", staticsRoute);
+app.use("/api/statistics", statisticsRoute);
 
 
 async function assertDatabaseConnectionOk() {

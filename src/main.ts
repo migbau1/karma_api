@@ -26,7 +26,7 @@ const app: Express = express();
 // Middleware para parsear datos binarios
 app.use(express.raw({ type: 'application/octet-stream', limit: '10mb' }));
 
-const whitelist = ["https://karma-app-roan.vercel.app", "http://localhost:3000", "http://127.0.0.1:3000", "https://bya-sas.com/"];
+const whitelist = ["https://karma-app-roan.vercel.app", "http://localhost:3000", "http://127.0.0.1:3000", "https://anditransas.xyz"];
 
 const corsOptions: CorsOptions = {
   allowedHeaders: ["Origin, X-Requested-With, Content-Type, Accept", "Access-Control-Allow-Credentials"],

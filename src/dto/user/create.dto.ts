@@ -7,6 +7,7 @@ interface IUserCreateDto {
     telefono: string
     rol?: string
     ubicacion?: IUbicacionDto
+    roleId?: string
 }
 
 export default IUserCreateDto

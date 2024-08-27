@@ -63,29 +63,33 @@ async function exportEncomienda(req: Request, res: Response) {
     });
 
     const options: FindOptions<InferAttributes<IEncomiendaModel, { omit: never; }>> = {
-        attributes: ['id', 'descripcion'],
+        attributes: ['id', 'descripcion', 'createdAt'],
         include: [
             ...defaultIncludes()
         ],
         transaction
     }
 
-    let fecha
-
     const coldate = moment().tz("America/Bogota");
 
-    if (fecha !== undefined) {
-        fecha = {
-            date: new Date(fecha).toLocaleDateString("es-CO"),
-            hora: new Date(fecha).getHours() + ":" + new Date(fecha).getMinutes(),
-        };
-        console.log("fecha1:  ", fecha);
-    } else {
-        fecha = {
-            date: coldate.toDate(),
-            hora: coldate.hour() + ":" + coldate.minute(),
-        };
-    }
+    let fecha = {
+        date: coldate.toDate(),
+        hora: coldate.hour() + ":" + coldate.minute(),
+    };
+
+
+    // if (fecha !== undefined) {
+    //     fecha = {
+    //         date: new Date(fecha).toLocaleDateString("es-CO"),
+    //         hora: new Date(fecha).getHours() + ":" + new Date(fecha).getMinutes(),
+    //     };
+    //     console.log("fecha1:  ", fecha);
+    // } else {
+    //     fecha = {
+    //         date: coldate.toDate(),
+    //         hora: coldate.hour() + ":" + coldate.minute(),
+    //     };
+    // }
 
     try {
         const tmpEncomienda = await encomiendaModel.findByPk(tmpId, options)
@@ -107,8 +111,16 @@ async function exportEncomienda(req: Request, res: Response) {
             facturacion,
             descripcion,
             sede,
-            id } = tmpEncomienda
+            createdAt,
+            id
+        } = tmpEncomienda
 
+        if (createdAt) {
+            fecha = {
+                date: moment(createdAt).tz("America/Bogota").toDate(),
+                hora: new Date(createdAt).getHours() + ":" + new Date(createdAt).getMinutes(),
+            }
+        }
 
         /**
          * Apartado de Informacion de la empresa - HEADER

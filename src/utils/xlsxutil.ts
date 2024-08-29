@@ -115,6 +115,7 @@ async function exportEncomienda(req: Request, res: Response) {
             id
         } = tmpEncomienda
 
+
         if (createdAt) {
             fecha = {
                 date: moment(createdAt).tz("America/Bogota").toDate(),
@@ -324,15 +325,15 @@ async function exportEncomienda(req: Request, res: Response) {
             //punto Servicio
             ws.getRow(6).getCell(5).value = tmpSede.nombre;
             //generado por
-            ws.getRow(6).getCell(11).value = req.user?.nombre || '';
+            ws.getRow(6).getCell(11).value = `${req.user?.nombre} ${req.user?.apellido}` || '';
             //punto Servicio
             ws.getRow(32).getCell(5).value = tmpSede.nombre;
             //generado por
-            ws.getRow(32).getCell(11).value = req.user?.nombre || '';
+            ws.getRow(32).getCell(11).value = `${req.user?.nombre} ${req.user?.apellido}` || '';
             //punto Servicio
             ws.getRow(58).getCell(5).value = tmpSede.nombre;
             //generado por
-            ws.getRow(58).getCell(11).value = req.user?.nombre || '';
+            ws.getRow(58).getCell(11).value = `${req.user?.nombre} ${req.user?.apellido}` || '';
         }
 
         if (facturacion) {

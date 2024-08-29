@@ -88,6 +88,13 @@ module.exports = {
         field: 'tipo_producto'
       }, { transaction })
 
+      // Actualiza todos los registros de la tabla 'productos' en una sola consulta
+      await queryInterface.sequelize.query(
+        "UPDATE productos SET nombre = CONCAT(nombre, ' con ', descripcion)",
+        { transaction }
+      );
+
+
       /** USUARIOS SEDES */
 
       await queryInterface.createTable('usuario_sedes', {

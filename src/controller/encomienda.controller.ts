@@ -53,7 +53,7 @@ const createOne = async (req: Request, res: Response) => {
       facturacion,
       descripcion } = req.body as IEncomiendaCreateDto
 
-    const [tmpRemitente] = await usuarioModel.findOrCreate({
+    const [tmpRemitente, createdRemitente] = await usuarioModel.findOrCreate({
       where: {
         cedula: remitente.cedula
       },
@@ -66,7 +66,16 @@ const createOne = async (req: Request, res: Response) => {
       }, transaction
     })
 
-    const [tmpDestinatario] = await usuarioModel.findOrCreate({
+    if (!createdRemitente) {
+      await tmpRemitente.update({
+        nombre: remitente.nombre,
+        apellido: remitente.apellido,
+        telefono: remitente.telefono,
+        roleId: tmpRemitente.roleId || Roles.cliente
+      }, { transaction });
+    }
+
+    const [tmpDestinatario, createdDestinatario] = await usuarioModel.findOrCreate({
       where: {
         cedula: destinatario.cedula
       },
@@ -74,10 +83,19 @@ const createOne = async (req: Request, res: Response) => {
         nombre: destinatario.nombre,
         apellido: destinatario.apellido,
         cedula: destinatario.cedula,
-        telefono: remitente.telefono,
+        telefono: destinatario.telefono,
         roleId: Roles.cliente
       }, transaction
     })
+
+    if (!createdDestinatario) {
+      await tmpDestinatario.update({
+        nombre: destinatario.nombre,
+        apellido: destinatario.apellido,
+        telefono: destinatario.telefono,
+        roleId: tmpRemitente.roleId || Roles.cliente
+      }, { transaction });
+    }
 
     const tmpOrigen = await ubicacionModel.create({
       departamento: origen.departamento,

@@ -133,6 +133,10 @@ const findAll = async (
       tmpWhere.roleId = {
         [Op.in]: [Roles.admin]
       }
+    } else {
+      tmpWhere.roleId = {
+        [Op.notIn]: [Roles.admin]
+      }
     }
 
     if (departamento) {
@@ -151,7 +155,7 @@ const findAll = async (
       tmpWhere = {
         ...tmpWhere,
         [Op.or]: [
-          where(fn("concat", col("nombre"),' ', col("apellido")), {
+          where(fn("concat", col("nombre"), ' ', col("apellido")), {
             [Op.like]: `%${search}%`
           }),
           {

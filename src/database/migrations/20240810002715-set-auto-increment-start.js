@@ -9,7 +9,7 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.sequelize.query('ALTER TABLE encomiendas AUTO_INCREMENT = 200001;');
+    await queryInterface.sequelize.query('ALTER TABLE encomiendas AUTO_INCREMENT = 200000;');
   },
 
   async down(queryInterface, Sequelize) {

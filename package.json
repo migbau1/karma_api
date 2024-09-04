@@ -18,7 +18,7 @@
     "migration:status": "sequelize-cli db:migrate:status",
     "seed:run": "sequelize-cli db:seed:all",
     "seed:revert": "sequelize-cli db:seed:undo",
-    "copy-files": "copyfiles -u 1 src/**/*.xlsx dist",
+    "copy-files": "copyfiles -u 1 src/**/*.{xlsx,png} dist",
     "postbuild": "npm run copy-files"
   },
   "repository": {
@@ -48,6 +48,7 @@
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
+    "puppeteer": "^9.1.1",
     "sequelize": "^6.34.0",
     "uuid": "^9.0.1"
   },

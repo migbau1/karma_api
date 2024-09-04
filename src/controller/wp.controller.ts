@@ -76,31 +76,39 @@ async function sendDocument(req: Request, res: Response) {
 
     try {
         const fileBuffer = fs.readFileSync(file.filepath);
-        const uploadResponse = await uploadDocument(fileBuffer, file.originalFilename || 'uploaded-document.xlsx');
+        const uploadResponse = await uploadDocument(fileBuffer, file.originalFilename || 'uploaded-document.pdf');
         const mediaId = uploadResponse.id;
 
-        const data = {
-            messaging_product: 'whatsapp',
-            to,
-            type: 'template',
-            template: {
-                name: 'send_guide',
-                language: { code: 'es' },
-                components: [{
-                    type: 'header',
-                    parameters: [{
-                        type: 'document',
-                        document: {
-                            id: mediaId,
-                            filename: file.originalFilename || 'uploaded-document.xlsx'
-                        }
+        // Iterar sobre el array de números de teléfono y enviar el documento a cada uno
+        const sendPromises = to.map(async (phoneNumber: string) => {
+            const data = {
+                messaging_product: 'whatsapp',
+                to: phoneNumber,
+                type: 'template',
+                template: {
+                    name: 'send_guide',
+                    language: { code: 'es' },
+                    components: [{
+                        type: 'header',
+                        parameters: [{
+                            type: 'document',
+                            document: {
+                                id: mediaId,
+                                filename: file.originalFilename || 'uploaded-document.pdf'
+                            }
+                        }]
                     }]
-                }]
-            }
-        };
+                }
+            };
 
-        const response = await axios.post(MESSAGE_URL, data, config);
-        res.json(response.data);
+            return axios.post(MESSAGE_URL, data, config);
+        });
+
+        // Esperar a que todas las solicitudes se completen
+        const responses = await Promise.all(sendPromises);
+
+        // Enviar la respuesta con los resultados de todas las solicitudes
+        res.json(responses.map(response => response.data));
     } catch (error) {
         handleAxiosError(error, res);
     }

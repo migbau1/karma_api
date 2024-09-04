@@ -1,4 +1,4 @@
-import Excel from 'exceljs'
+import Excel, { Workbook } from 'exceljs'
 import moment from 'moment-timezone'
 import { Request, Response } from 'express'
 import sequelize from '../database/connection'
@@ -13,6 +13,8 @@ import bwipjs from 'bwip-js';
 import fs from 'fs';
 import Jimp from 'jimp';
 
+import puppeteer from 'puppeteer'
+
 const encomiendaModel = sequelize.model('encomiendas') as ModelCtor<IEncomiendaModel>
 const sedeModel = sequelize.model('sedes') as ModelCtor<ISedeModel>
 
@@ -23,6 +25,7 @@ async function exportEncomienda(req: Request, res: Response) {
     const code = v4();
     const transaction = await sequelize.transaction()
     const tmpId = req.params.id
+    const qu = req.query
 
     const workbook = await wb.xlsx.readFile(
         path.resolve(__dirname, "../templates/TEMPLATE_ANDITRAN.xlsx")
@@ -76,20 +79,6 @@ async function exportEncomienda(req: Request, res: Response) {
         date: coldate.toDate(),
         hora: coldate.hour() + ":" + coldate.minute(),
     };
-
-
-    // if (fecha !== undefined) {
-    //     fecha = {
-    //         date: new Date(fecha).toLocaleDateString("es-CO"),
-    //         hora: new Date(fecha).getHours() + ":" + new Date(fecha).getMinutes(),
-    //     };
-    //     console.log("fecha1:  ", fecha);
-    // } else {
-    //     fecha = {
-    //         date: coldate.toDate(),
-    //         hora: coldate.hour() + ":" + coldate.minute(),
-    //     };
-    // }
 
     try {
         const tmpEncomienda = await encomiendaModel.findByPk(tmpId, options)
@@ -415,7 +404,6 @@ async function exportEncomienda(req: Request, res: Response) {
         ws.getRow(47).getCell(5).value = msg;
         ws.getRow(73).getCell(5).value = msg;
 
-
         ws.eachRow((row) => row.commit());
 
         await wb.xlsx.writeFile(
@@ -425,6 +413,102 @@ async function exportEncomienda(req: Request, res: Response) {
         const wbbuf = await wb.xlsx.writeBuffer({
             filename: path.resolve(__dirname, "../templates/TEMPLATEGUIA.xlsx"),
         });
+
+        if (qu.pdf) {
+            const logoPath = path.resolve(__dirname, "../templates/logos/andilogo.png")
+            const logoBase64 = getBase64Image(logoPath);
+            const total = facturacion!.valorFlete + facturacion!.otrosCobros + facturacion!.valorSeguro + facturacion!.recargos - facturacion!.descuentos
+            const htmlContent = `
+                <html>
+    <head>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+            th, td { padding: 8px; border: 1px solid #ddd; text-align: left; }
+            h1, h2 { text-align: center; }
+            .header-info { text-align: right; }
+            .logo-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+            .logo-container img { width: 150px; margin-right: 20px; }
+        </style>
+    </head>
+    <body>
+        <h1>Detalles de la Encomienda</h1>
+        <div class="logo-container">
+            <img src="${logoBase64}" alt="Logo de Anditran" />
+            <div class="header-info">
+                <p><strong>ANDITRAN SAS</strong></p>
+                <p>NIT. 901.469.273-6</p>
+                <p>DIR. CRA 23 # 19 - 14 SAN FRANCISCO</p>
+                <p>TEL: 3112847510 - 316 2269482</p>
+                <b>Referencia: ${id}</b>
+            </div>
+        </div>
+        <h2>Información del Remitente</h2>
+        <table>
+            <tr><th>Remite</th><td>${remitente!.nombre} ${remitente!.apellido}</td></tr>
+            <tr><th>Teléfono</th><td>${remitente!.telefono}</td></tr>
+            <tr><th>Cédula</th><td>${remitente!.cedula}</td></tr>
+        </table>
+        <h2>Información del Destinatario</h2>
+        <table>
+            <tr><th>Destinatario</th><td>${destinatario!.nombre} ${destinatario!.apellido}</td></tr>
+            <tr><th>Teléfono</th><td>${destinatario!.telefono}</td></tr>
+            <tr><th>Cédula</th><td>${destinatario!.cedula}</td></tr>
+        </table>
+        <h2>Origen de la Encomienda</h2>
+        <table>
+            <tr><th>Dirección</th><td>${origen!.direccion}</td></tr>
+            <tr><th>Municipio</th><td>${origen!.municipio}</td></tr>
+            <tr><th>Departamento</th><td>${origen!.departamento}</td></tr>
+            <tr><th>Código Postal</th><td>${origen!.codigoPostal}</td></tr>
+        </table>
+        <h2>Destino de la Encomienda</h2>
+        <table>
+            <tr><th>Dirección</th><td>${destino!.direccion}</td></tr>
+            <tr><th>Municipio</th><td>${destino!.municipio}</td></tr>
+            <tr><th>Departamento</th><td>${destino!.departamento}</td></tr>
+            <tr><th>Código Postal</th><td>${destino!.codigoPostal}</td></tr>
+        </table>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <h2>Información del Producto</h2>
+        <table>
+            <tr><th>Contiene</th><td>${producto!.nombre}</td></tr>
+            <tr><th>Cantidad</th><td>${producto!.cantidad}</td></tr>
+            <tr><th>Peso</th><td>${producto!.peso} kg</td></tr>
+            <tr><th>Valor Declarado</th><td>${producto!.valorDeclarado}</td></tr>
+            <tr><th>Peso Cobrado</th><td>${producto!.pesoCob} kg</td></tr>
+            <tr><th>Peso Volumétrico</th><td>${producto!.pesoVol} kg</td></tr>
+        </table>
+        <h2>Fecha y Hora de Admisión</h2>
+        <table>
+            <tr><th>Fecha</th><td>${moment(fecha.date).tz("America/Bogota").format('YYYY-MM-DD')}</td></tr>
+            <tr><th>Hora</th><td>${fecha.hora}</td></tr>
+        </table>
+        <h2>Facturación</h2>
+        <table>
+            <tr><th>Valor Seguro</th><td>${formatCurrency(facturacion!.valorSeguro)}</td></tr>
+            <tr><th>Otros Cobros</th><td>${formatCurrency(facturacion!.otrosCobros)}</td></tr>
+            <tr><th>Valor Flete</th><td>${formatCurrency(facturacion!.valorFlete)}</td></tr>
+            <tr><th>Recargos</th><td>${formatCurrency(facturacion!.recargos)}</td></tr>
+            <tr><th>Descuentos</th><td>${formatCurrency(facturacion!.descuentos)}</td></tr>
+            <tr><th>Total</th><td>${formatCurrency(total)}</td></tr>
+            <tr><th>Modo de Pago</th><td>${facturacion!.modoDePago}</td></tr>
+        </table>
+    </body>
+    </html>
+            `
+            // Convertir el HTML a PDF usando Puppeteer
+            const pdfBuffer = await htmlToPdf(htmlContent);
+            // Enviar el PDF resultante al cliente
+            res.setHeader('Content-Disposition', 'attachment; filename=output.pdf');
+            res.setHeader('Content-Type', 'application/pdf');
+            res.send(pdfBuffer);
+            return;
+        }
+
         res.writeHead(200, [
             [
                 "Content-Type",
@@ -445,5 +529,39 @@ async function exportEncomienda(req: Request, res: Response) {
     }
 
 }
+
+function getBase64Image(filePath: string) {
+    try {
+        const image = fs.readFileSync(filePath);
+        return `data:image/png;base64,${image.toString('base64')}`;
+    } catch (error) {
+        console.error('Error al leer la imagen:', error);
+        return null;
+    }
+}
+
+function formatCurrency(value: number) {
+    // Verifica si el valor es un número
+    if (isNaN(value)) {
+        return value;
+    }
+
+    // Convierte el valor a un número con 2 decimales y lo formatea con separadores de miles
+    return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(value);
+}
+
+const htmlToPdf = async (html: string) => {
+    const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    await page.setContent(html);
+    const pdfBuffer = await page.pdf({ format: 'a4' });
+    await browser.close();
+    return pdfBuffer;
+};
 
 export default exportEncomienda;

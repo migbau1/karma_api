@@ -76,7 +76,7 @@ async function sendDocument(req: Request, res: Response) {
 
     try {
         const fileBuffer = fs.readFileSync(file.filepath);
-        const uploadResponse = await uploadDocument(fileBuffer, file.originalFilename || 'uploaded-document.pdf');
+        const uploadResponse = await uploadDocument(fileBuffer, file.originalFilename || 'uploaded-document.xlsx');
         const mediaId = uploadResponse.id;
 
         // Iterar sobre el array de números de teléfono y enviar el documento a cada uno

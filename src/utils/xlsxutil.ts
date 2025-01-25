@@ -76,9 +76,11 @@ async function exportEncomienda(req: Request, res: Response) {
     const coldate = moment().tz("America/Bogota");
 
     let fecha = {
-        date: coldate.toDate(),
-        hora: coldate.hour() + ":" + coldate.minute(),
+        date: coldate.toDate(), // Convierte a un objeto Date en la zona horaria configurada
+        hora: coldate.format("HH:mm"), // Usa moment para formatear la hora correctamente
     };
+
+
 
     try {
         const tmpEncomienda = await encomiendaModel.findByPk(tmpId, options)
@@ -106,11 +108,17 @@ async function exportEncomienda(req: Request, res: Response) {
 
 
         if (createdAt) {
+            const fechaMoment = moment(createdAt).tz("America/Bogota");
             fecha = {
-                date: moment(createdAt).tz("America/Bogota").toDate(),
-                hora: new Date(createdAt).getHours() + ":" + new Date(createdAt).getMinutes(),
-            }
+                date: fechaMoment.toDate(), // Convierte a Date respetando la zona horaria
+                hora: fechaMoment.format("HH:mm"), // Formatea la hora directamente
+            };
         }
+
+        console.log(coldate);
+        console.log(createdAt);
+
+
 
         /**
          * Apartado de Informacion de la empresa - HEADER
@@ -286,9 +294,9 @@ async function exportEncomienda(req: Request, res: Response) {
             //peso vol
             ws.getRow(11).getCell(24).value = String(producto.pesoVol);
             //fecha admision
-            ws.getRow(6).getCell(24).value = fecha.date;
+            ws.getRow(6).getCell(24).value = moment(fecha.date).format("YYYY-MM-DD"); 
             //Hora Admision
-            ws.getRow(7).getCell(24).value = fecha.hora;
+            ws.getRow(7).getCell(24).value = moment(fecha.date).format("HH:mm"); 
             //Mod. Transporte
             ws.getRow(8).getCell(18).value = "Terrestre";
             // //Observaciones generales
@@ -360,9 +368,9 @@ async function exportEncomienda(req: Request, res: Response) {
             //Forma de pago
             ws.getRow(33).getCell(11).value = facturacion.modoDePago;
             //fecha admision
-            ws.getRow(32).getCell(24).value = fecha.date;
+            ws.getRow(32).getCell(24).value = moment(fecha.date).format("YYYY-MM-DD"); 
             //Hora Admision
-            ws.getRow(33).getCell(24).value = fecha.hora;
+            ws.getRow(33).getCell(24).value = moment(fecha.date).format("HH:mm"); 
             //Mod. Transporte
             ws.getRow(34).getCell(18).value = "Terrestre";
             //Observaciones generales
@@ -381,9 +389,9 @@ async function exportEncomienda(req: Request, res: Response) {
             //Valor descuento
             ws.getRow(67).getCell(24).value = facturacion.descuentos;
             //fecha admision
-            ws.getRow(58).getCell(24).value = fecha.date;
+            ws.getRow(58).getCell(24).value = moment(fecha.date).format("YYYY-MM-DD"); 
             //Hora Admision
-            ws.getRow(59).getCell(24).value = fecha.hora;
+            ws.getRow(59).getCell(24).value = moment(fecha.date).format("HH:mm"); 
             //Mod. Transporte
             ws.getRow(60).getCell(18).value = "Terrestre";
             //Observaciones generales

@@ -28,7 +28,7 @@ async function exportEncomienda(req: Request, res: Response) {
     const qu = req.query
 
     const workbook = await wb.xlsx.readFile(
-        path.resolve(__dirname, "../templates/TEMPLATE_ANDITRAN.xlsx")
+        path.resolve(__dirname, "../templates/TEMPLATE_ENVIOSANAYA.xlsx")
     );
     let ws = workbook.getWorksheet("hoja1")!;
 
@@ -123,10 +123,10 @@ async function exportEncomienda(req: Request, res: Response) {
         /**
          * Apartado de Informacion de la empresa - HEADER
          */
-        ws.getRow(2).getCell(8).value = "ANDITRAN SAS"
-        ws.getRow(3).getCell(8).value = "NIT. 901.469.273-6"
-        ws.getRow(4).getCell(8).value = "DIR. CRA 23 # 19 - 14 SAN FRANCISCO"
-        ws.getRow(5).getCell(8).value = "TEL: 3112847510 - 316 2269482"
+        ws.getRow(2).getCell(8).value = "ENVIOS ANAYA"
+        ws.getRow(3).getCell(8).value = "NIT. 901.661.421-1"
+        ws.getRow(4).getCell(8).value = "DIR. CLL 33 # 19-64 CENTRO B/MANGA"
+        ws.getRow(5).getCell(8).value = "TEL: 3103048782 - 3144099530"
         //codigoDebarras
         // ws.getRow(3).getCell(12).value = code;
 
@@ -137,10 +137,10 @@ async function exportEncomienda(req: Request, res: Response) {
         //consecutivo
         ws.getRow(3).getCell(23).value = id || "XXXX";
         //=======================================================
-        ws.getRow(28).getCell(8).value = "ANDITRAN SAS"
-        ws.getRow(29).getCell(8).value = "NIT. 901.469.273-6"
-        ws.getRow(30).getCell(8).value = "DIR. CRA 23 # 19 - 14 SAN FRANCISCO"
-        ws.getRow(31).getCell(8).value = "TEL: 3112847510 - 316 2269482"
+        ws.getRow(28).getCell(8).value = "ENVIOS ANAYA"
+        ws.getRow(29).getCell(8).value = "NIT. 901.661.421-1"
+        ws.getRow(30).getCell(8).value = "DIR. CLL 33 # 19-64 CENTRO B/MANGA"
+        ws.getRow(31).getCell(8).value = "TEL: 3103048782 - 3144099530"
         //codigoDebarras
         // ws.getRow(29).getCell(12).value = code;
         ws.addImage(imageId, {
@@ -150,10 +150,10 @@ async function exportEncomienda(req: Request, res: Response) {
         //consecutivo
         ws.getRow(29).getCell(23).value = id || "XXXX";
         //=======================================================
-        ws.getRow(54).getCell(8).value = "ANDITRAN SAS"
-        ws.getRow(55).getCell(8).value = "NIT. 901.469.273-6"
-        ws.getRow(56).getCell(8).value = "DIR. CRA 23 # 19 - 14 SAN FRANCISCO"
-        ws.getRow(57).getCell(8).value = "TEL: 3112847510 - 316 2269482"
+        ws.getRow(54).getCell(8).value = "ENVIOS ANAYA"
+        ws.getRow(55).getCell(8).value = "NIT. 901.661.421-1"
+        ws.getRow(56).getCell(8).value = "DIR. CLL 33 # 19-64 CENTRO B/MANGA"
+        ws.getRow(57).getCell(8).value = "TEL: 3103048782 - 3144099530"
         //codigoDebarras
         // ws.getRow(55).getCell(12).value = code;
         ws.addImage(imageId, {
@@ -406,7 +406,7 @@ async function exportEncomienda(req: Request, res: Response) {
         ws.getRow(33).getCell(8).value = "Domicilio";
         ws.getRow(59).getCell(8).value = "Domicilio";
 
-        const msg = `El usuario manifiesta que conoce los terminos y condiciones del contrato que encontro publicado en el punto de venta y/o suministro el operador para la lectura, cuyo contenido acepta con la suscripcion de este documento. Para efecto de PQR el usuario podra manifestarlas a traves de las lineas telefonicas de atencion al cliente Tel. 31128475 - 3162269482 - 3222800102 - 037687930 o a los correos electrinicos anditransas@gmail.com`
+        const msg = `El usuario manifiesta que conoce los terminos y condiciones del contrato que encontro publicado en el punto de venta y/o suministro el operador para la lectura, cuyo contenido acepta con la suscripcion de este documento. Para efecto de PQR el usuario podra manifestarlas a traves de las lineas telefonicas de atencion al cliente Tel. 3103048782 - 3144099530 o a los correos electronicos enviosanayasas@gmail.com`
 
         ws.getRow(21).getCell(5).value = msg;
         ws.getRow(47).getCell(5).value = msg;

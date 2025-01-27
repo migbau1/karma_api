@@ -296,7 +296,7 @@ async function exportEncomienda(req: Request, res: Response) {
             //fecha admision
             ws.getRow(6).getCell(24).value = moment(fecha.date).format("YYYY-MM-DD"); 
             //Hora Admision
-            ws.getRow(7).getCell(24).value = moment(fecha.date).format("HH:mm"); 
+            ws.getRow(7).getCell(24).value = moment(fecha.date).tz("America/Bogota").format("HH:mm"); 
             //Mod. Transporte
             ws.getRow(8).getCell(18).value = "Terrestre";
             // //Observaciones generales
@@ -370,7 +370,7 @@ async function exportEncomienda(req: Request, res: Response) {
             //fecha admision
             ws.getRow(32).getCell(24).value = moment(fecha.date).format("YYYY-MM-DD"); 
             //Hora Admision
-            ws.getRow(33).getCell(24).value = moment(fecha.date).format("HH:mm"); 
+            ws.getRow(33).getCell(24).value = moment(fecha.date).tz("America/Bogota").format("HH:mm"); 
             //Mod. Transporte
             ws.getRow(34).getCell(18).value = "Terrestre";
             //Observaciones generales
@@ -391,7 +391,7 @@ async function exportEncomienda(req: Request, res: Response) {
             //fecha admision
             ws.getRow(58).getCell(24).value = moment(fecha.date).format("YYYY-MM-DD"); 
             //Hora Admision
-            ws.getRow(59).getCell(24).value = moment(fecha.date).format("HH:mm"); 
+            ws.getRow(59).getCell(24).value = moment(fecha.date).tz("America/Bogota").format("HH:mm"); 
             //Mod. Transporte
             ws.getRow(60).getCell(18).value = "Terrestre";
             //Observaciones generales
